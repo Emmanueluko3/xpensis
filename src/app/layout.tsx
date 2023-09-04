@@ -9,7 +9,6 @@ export const metadata: Metadata = {
   description:
     "Xpensis Is a Progressive Web Application that allows users to track their expenses",
   manifest: "/manifest.json",
-  icons: Logo,
 };
 
 export default function RootLayout({
