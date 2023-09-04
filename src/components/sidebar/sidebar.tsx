@@ -146,7 +146,8 @@ const Sidebar: React.FC = () => {
           </button>
         </div>
       </div>
-      <div className="flex justify-between flex-row  px-6 py-1 md:hidden mt-20 w-full fixed bottom-0 bg-white">
+
+      <div className="flex justify-between flex-row  px-6 pt-1 pb-8 md:hidden mt-20 w-full bg-white fixed bottom-0">
         {navLinks.map((link, index) => (
           <Link href={link.href} key={index} className="my-3">
             <h3
