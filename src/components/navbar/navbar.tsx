@@ -70,7 +70,7 @@ const Navbar: React.FC = () => {
             />
           </div>
         </Link>
-        <button className="text-2xl">{notificationIcon}</button>
+        <button className="text-2xl text-gray-950">{notificationIcon}</button>
       </div>
     </>
   );
