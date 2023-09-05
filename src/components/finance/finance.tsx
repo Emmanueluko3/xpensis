@@ -55,9 +55,8 @@ const Finance: React.FC = () => {
           className="mySwiper"
         >
           {financialCategories.map((item, index) => (
-            <SwiperSlide>
+            <SwiperSlide key={index}>
               <Card
-                key={index}
                 title={item.title}
                 price={item.price}
                 duration={item.duration}
