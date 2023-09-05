@@ -98,7 +98,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      <div className=" w-64 h-screen px-6 py-9 bg-white hidden lg:block">
+      <div className=" w-64 h-screen px-6 py-9 z-50 bg-white hidden lg:block">
         <Link href="/">
           <Image
             //   width={500}
@@ -147,7 +147,7 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex justify-between flex-row items-center px-6 pt-1 pb-8 lg:hidden mt-20 w-full bg-white fixed bottom-0">
+      <div className="flex justify-between z-50 flex-row items-center px-6 pt-1 pb-8 lg:hidden mt-20 w-full bg-white fixed bottom-0">
         {navLinks.map((link, index) => (
           <Link href={link.href} key={index} className="my-3">
             <h3

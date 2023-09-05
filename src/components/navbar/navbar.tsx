@@ -40,7 +40,7 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <div className="justify-between bg-white p-5 lg:pr-9 w-full hidden lg:flex">
+      <div className="justify-between bg-white z-50 p-5 lg:pr-9 w-full hidden lg:flex">
         <h2 className="font-bold text-2xl">{navTitle}</h2>
         <div className="flex">
           <button className="text-2xl mr-4">{notificationIcon}</button>
@@ -58,7 +58,7 @@ const Navbar: React.FC = () => {
           </Link>
         </div>
       </div>
-      <div className="flex justify-between items-center flex-row px-6 py-4 lg:hidden w-full bg-white fixed top-0">
+      <div className="flex justify-between items-center flex-row z-50 px-6 py-4 lg:hidden w-full bg-white fixed top-0">
         <Link href="/">
           <div>
             <Image

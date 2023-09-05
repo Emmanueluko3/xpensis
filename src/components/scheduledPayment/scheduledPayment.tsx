@@ -17,9 +17,13 @@ const ScheduledPayment: React.FC = () => {
           View all
         </button>
       </div>
-      <div className="grid grid-cols-3 grid-flow-row gap-4 overflow-y-auto">
+
+      <div className="grid grid-cols-3 grid-flow-row gap-4 overflow-x-auto">
         {scheduledBills.map((item, index) => (
-          <div key={index} className="p-5 border border-[#D2D2D2] rounded-lg">
+          <div
+            key={index}
+            className="p-5 border border-[#D2D2D2] rounded-lg w-48"
+          >
             <h3 className="text-gray-950 font-bold text-lg mb-2">
               {item.title}
             </h3>

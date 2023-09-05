@@ -1,9 +1,15 @@
 import Card from "@/components/cards/card";
+import AreaChart from "@/components/charts/areaChart";
 import Navbar from "@/components/navbar/navbar";
 import ScheduledPayment from "@/components/scheduledPayment/scheduledPayment";
 import Sidebar from "@/components/sidebar/sidebar";
 import Transactions from "@/components/transactions/transactions";
+import dynamic from "next/dynamic";
 
+const DynamicComponentWithNoSSR = dynamic(
+  () => import("@/components/charts/areaChart"),
+  { ssr: false }
+);
 export default function Dashboard() {
   const financialCategories = [
     {
@@ -51,7 +57,12 @@ export default function Dashboard() {
 
           <div className="w-full mb-5 grid grid-flow-row lg:grid-cols-3 gap-3">
             <div className="w-full lg:col-span-2">
-              <ScheduledPayment />
+              <div className="mb-5">
+                <ScheduledPayment />
+              </div>
+              <div className="mb-5">
+                <DynamicComponentWithNoSSR />
+              </div>
             </div>
             <div className="lg:col-span-1">
               <Transactions />
