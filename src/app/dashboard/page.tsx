@@ -1,6 +1,8 @@
 import Card from "@/components/cards/card";
 import Navbar from "@/components/navbar/navbar";
+import ScheduledPayment from "@/components/scheduledPayment/scheduledPayment";
 import Sidebar from "@/components/sidebar/sidebar";
+import Transactions from "@/components/transactions/transactions";
 
 export default function Dashboard() {
   const financialCategories = [
@@ -33,8 +35,8 @@ export default function Dashboard() {
       </div>
       <div className="w-full">
         <Navbar />
-        <div className="bg-[#E5E6EB] h-[50vh] p-5 pt-20 lg:pt-5 w-full lg:pr-9">
-          <div className="grid grid-flow-row lg:grid-cols-3 gap-3">
+        <div className="bg-[#E5E6EB] h-full p-5 pt-20 pb-24 lg:pb-5 lg:pt-5 w-full lg:pr-9">
+          <div className="grid grid-flow-row lg:grid-cols-3 gap-3 mb-5">
             {financialCategories.map((item, index) => (
               <Card
                 key={index}
@@ -45,6 +47,15 @@ export default function Dashboard() {
                 variant={item.variant}
               />
             ))}
+          </div>
+
+          <div className="w-full mb-5 grid grid-flow-row lg:grid-cols-3 gap-3">
+            <div className="w-full lg:col-span-2">
+              <ScheduledPayment />
+            </div>
+            <div className="lg:col-span-1">
+              <Transactions />
+            </div>
           </div>
         </div>
       </div>
