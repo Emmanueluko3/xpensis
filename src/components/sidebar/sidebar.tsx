@@ -155,7 +155,7 @@ const Sidebar: React.FC = () => {
                 "/" + pathname === link.href
                   ? "text-customBlue bg-customBlue bg-opacity-10"
                   : "text-customGray"
-              } flex items-center font-bold hover:bg-customBlue hover:text-customBlue hover:bg-opacity-10 text-base`}
+              } flex items-center font-bold text-base`}
             >
               {link.icon}
             </h3>

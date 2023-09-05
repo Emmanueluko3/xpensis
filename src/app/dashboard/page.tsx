@@ -29,13 +29,13 @@ export default function Dashboard() {
     },
   ];
   return (
-    <div className="flex lg:pl-8 lg:px-0 bg-white">
+    <div className="flex lg:pl-8 lg:px-0 bg-[#fff]">
       <div>
         <Sidebar />
       </div>
       <div className="w-full">
         <Navbar />
-        <div className="bg-[#E5E6EB] h-full p-5 pt-20 pb-24 lg:pb-5 lg:pt-5 w-full lg:pr-9">
+        <div className="bg-[#F9FAFA] h-full p-5 pt-20 pb-24 lg:pb-5 lg:pt-5 w-full lg:pr-9">
           <div className="grid grid-flow-row lg:grid-cols-3 gap-3 mb-5">
             {financialCategories.map((item, index) => (
               <Card

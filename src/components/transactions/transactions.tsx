@@ -83,7 +83,7 @@ const Transactions: React.FC = () => {
     },
   ];
   return (
-    <div className="bg-white rounded-lg p-5 w-full">
+    <div className="bg-[#fff] rounded-lg p-5 w-full">
       <div className="flex justify-between w-full mb-6">
         <h3 className="text-gray-950 font-bold text-base">
           Recent Transactions
@@ -96,7 +96,7 @@ const Transactions: React.FC = () => {
         {recentTransactions.map((item, index) => (
           <div
             key={index}
-            className="py-4 border-b border-[#D2D2D2] w-full flex items-center justify-between"
+            className="py-4 border-b border-[#D2D2D2] w-full flex justify-between mb-2"
           >
             <div
               className={`flex justify-center text-2xl items-center w-9 h-9 rounded-full bg-opacity-5 mr-3 ${
@@ -107,12 +107,14 @@ const Transactions: React.FC = () => {
             </div>
             <div className="mr-auto">
               {" "}
-              <h3 className="text-gray-950 font-bold text-sm mb-2">
+              <h3 className="text-gray-950 font-medium text-sm mb-2">
                 {item.title}
               </h3>
-              <p className=" text-customGray1 text-xs">{item.date}</p>
+              <p className=" text-customGray1 text-xs font-medium">
+                {item.date}
+              </p>
             </div>
-            <h3 className="text-base font-bold">&#8358; {item.amount}</h3>
+            <h3 className="text-base font-medium">&#8358; {item.amount}</h3>
           </div>
         ))}
       </div>

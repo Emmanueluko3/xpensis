@@ -8,7 +8,7 @@ const ScheduledPayment: React.FC = () => {
     { title: "Apple Music", amount: "3500", period: "/m" },
   ];
   return (
-    <div className="bg-white rounded-lg p-5 w-full">
+    <div className="bg-[#fff] rounded-lg p-5 w-full">
       <div className="flex justify-between w-full mb-4">
         <h3 className="text-gray-950 font-bold text-base">
           Scheduled Payments
