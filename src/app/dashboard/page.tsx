@@ -24,10 +24,10 @@ export default function Dashboard() {
 
           <div className="w-full mb-5 grid grid-flow-row lg:grid-cols-3 gap-3">
             <div className="w-full lg:col-span-2">
-              <div className="mb-5">
+              <div className="mb-5 w-full">
                 <ScheduledPayment />
               </div>
-              <div className="mb-5">
+              <div className="mb-5 w-full">
                 <DynamicComponentWithNoSSR />
               </div>
             </div>
