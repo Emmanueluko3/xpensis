@@ -1,10 +1,12 @@
 "use client";
-import * as React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import ProfilePics from "@/../public/assets/images/ProfilePics.svg";
 import Xpensis from "@/../public/assets/images/Xpensis.svg";
+import LottieNotification from "@/../public/assets/lotties/lottieNotification.json";
+import Lottie from "../atoms/lottie";
 
 const notificationIcon = (
   <svg
@@ -33,6 +35,7 @@ const navLinks = [
 ];
 const Navbar: React.FC = () => {
   const pathname = usePathname().split("/")[1];
+  const [isNotification, setIsNotification] = useState(true);
 
   const navTitle = navLinks
     .filter((item) => item.href === pathname)
@@ -43,7 +46,15 @@ const Navbar: React.FC = () => {
       <div className="justify-between bg-white z-50 p-5 lg:pr-9 w-full hidden lg:flex">
         <h2 className="font-bold text-2xl">{navTitle}</h2>
         <div className="flex">
-          <button className="text-2xl mr-4">{notificationIcon}</button>
+          <button className="text-2xl mr-4">
+            {isNotification ? (
+              <div className="w-8 h-8">
+                <Lottie lottie={LottieNotification} />
+              </div>
+            ) : (
+              notificationIcon
+            )}
+          </button>
           <Link href="/profile">
             <div className="flex items-center">
               <div className="h-8 w-8 mr-2">
@@ -70,7 +81,15 @@ const Navbar: React.FC = () => {
             />
           </div>
         </Link>
-        <button className="text-2xl text-gray-950">{notificationIcon}</button>
+        <button className="text-2xl text-gray-950">
+          {isNotification ? (
+            <div className="w-8 h-8">
+              <Lottie lottie={LottieNotification} />
+            </div>
+          ) : (
+            notificationIcon
+          )}
+        </button>
       </div>
     </>
   );
