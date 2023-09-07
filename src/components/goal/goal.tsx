@@ -350,7 +350,7 @@ const Goal: React.FC = () => {
   return (
     <div className="rounded-lg bg-[#fff] w-full p-5">
       <div className="flex justify-between  mb-4">
-        <p className="mb-5 text-customGray text-sm w-1/2">
+        <p className="mb-5 text-customGray text-sm lg:w-1/2">
           Set and achieve your financial goals, plan for a more secure future.
         </p>
         <button
