@@ -18,7 +18,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <div id="modal" className="z-[2147483647]"></div>
+        {children}
+      </body>
     </html>
   );
 }
