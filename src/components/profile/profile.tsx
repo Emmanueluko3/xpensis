@@ -140,7 +140,7 @@ const ProfileComponent: React.FC = () => {
 
         <div className="w-full">
           {profileMenu.map((item, index) => (
-            <div className="flex justify-between items-center my-3">
+            <div key={index} className="flex justify-between items-center my-3">
               <p>{item}</p> <span>{arrowIcon}</span>
             </div>
           ))}
