@@ -138,16 +138,17 @@ const ProfileComponent: React.FC = () => {
           </button>
         </div>
 
-        <div className="w-full">
+        <div className="w-full mb-7">
           {profileMenu.map((item, index) => (
             <div key={index} className="flex justify-between items-center my-3">
-              <p>{item}</p> <span>{arrowIcon}</span>
+              <p className="font-normal text-gray-950">{item}</p>{" "}
+              <span>{arrowIcon}</span>
             </div>
           ))}
-          <button className="flex items-center text-customRed hover:opacity-80">
-            <span className="mr-2">{trashIcon}</span> Delete Account
-          </button>
         </div>
+        <button className="flex items-center text-customRed hover:opacity-80">
+          <span className="mr-2">{trashIcon}</span> Delete Account
+        </button>
       </div>
       <div className="bg-[#fff] rounded-lg p-5 col-span-3">
         <h2 className=" font-bold text-lg">Account Settings</h2>
