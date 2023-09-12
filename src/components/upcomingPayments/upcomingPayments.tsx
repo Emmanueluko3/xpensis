@@ -49,7 +49,9 @@ const UpcomingPayments: React.FC = () => {
   return (
     <div className="bg-[#fff] rounded-lg p-5 w-full">
       <div className="flex justify-between w-full mb-6">
-        <h3 className="text-gray-950 font-bold text-base">Upcoming Payments</h3>
+        <h3 className="text-gray-950 font-bold lg:text-lg text-base">
+          Upcoming Payments
+        </h3>
       </div>
       <div className="w-full">
         {recentTransactions.map((item, index) => (

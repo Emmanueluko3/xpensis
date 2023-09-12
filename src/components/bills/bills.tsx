@@ -5,6 +5,10 @@ import Modal from "../molecules/Modals/modal";
 import Switch from "../atoms/switch";
 import LottieSuccess from "../../../public/assets/lotties/lottieSuccess.json";
 import Lottie from "../atoms/lottie";
+import Button from "../atoms/button";
+import InputGroup from "../molecules/inputGroup/inputGroup";
+import SelectGroup from "../molecules/inputGroup/selectGroup";
+import Card from "../cards/card";
 
 const energyIcon = (
   <svg
@@ -42,47 +46,64 @@ const arrowIcon = (
   </svg>
 );
 
+const addIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+  >
+    <path
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M10 18C12.1217 18 14.1566 17.1571 15.6569 15.6569C17.1571 14.1566 18 12.1217 18 10C18 7.87827 17.1571 5.84344 15.6569 4.34315C14.1566 2.84285 12.1217 2 10 2C7.87827 2 5.84344 2.84285 4.34315 4.34315C2.84285 5.84344 2 7.87827 2 10C2 12.1217 2.84285 14.1566 4.34315 15.6569C5.84344 17.1571 7.87827 18 10 18ZM11 7C11 6.73478 10.8946 6.48043 10.7071 6.29289C10.5196 6.10536 10.2652 6 10 6C9.73478 6 9.48043 6.10536 9.29289 6.29289C9.10536 6.48043 9 6.73478 9 7V9H7C6.73478 9 6.48043 9.10536 6.29289 9.29289C6.10536 9.48043 6 9.73478 6 10C6 10.2652 6.10536 10.5196 6.29289 10.7071C6.48043 10.8946 6.73478 11 7 11H9V13C9 13.2652 9.10536 13.5196 9.29289 13.7071C9.48043 13.8946 9.73478 14 10 14C10.2652 14 10.5196 13.8946 10.7071 13.7071C10.8946 13.5196 11 13.2652 11 13V11H13C13.2652 11 13.5196 10.8946 13.7071 10.7071C13.8946 10.5196 14 10.2652 14 10C14 9.73478 13.8946 9.48043 13.7071 9.29289C13.5196 9.10536 13.2652 9 13 9H11V7Z"
+      fill="#0784C7"
+    />
+  </svg>
+);
+
 const recentTransactions = [
   {
     title: "Rent",
     amount: 120000,
-    date: "15th May, 2023",
+    date: "15/5/23",
     status: "Paid",
   },
   {
     title: "Rent",
     amount: 120000,
-    date: "15th May, 2023",
+    date: "15/5/23",
     status: "Pending",
   },
   {
     title: "Wallet Funding",
     amount: 2220000,
-    date: "15th May, 2023",
+    date: "15/5/23",
     status: "Paid",
   },
   {
     title: "Rent",
     amount: 120000,
-    date: "15th May, 2023",
+    date: "15/5/23",
     status: "Pending",
   },
   {
     title: "Rent",
     amount: 120000,
-    date: "15th May, 2023",
+    date: "15/5/23",
     status: "Pending",
   },
   {
     title: "Wallet Funding",
     amount: 2220000,
-    date: "15th May, 2023",
+    date: "15/5/23",
     status: "Paid",
   },
   {
     title: "Rent",
     amount: 120000,
-    date: "15th May, 2023",
+    date: "15/5/23",
     status: "Pending",
   },
 ];
@@ -104,9 +125,22 @@ const months: string[] = [
 
 const days: string[] = ["Sun", "Mon", "Tue", "Tue", "Thu", "Fri", "Sat"];
 
+const allCategories = [
+  { label: "Electricity", value: "Electricity" },
+  { label: "Electricity", value: "Electricity" },
+  { label: "Electricity", value: "Electricity" },
+];
+
+const allBanks = [
+  { label: "Access Bank", value: "Access Bank" },
+  { label: "EcoBank", value: "EcoBank" },
+  { label: "Zenith Bank", value: "Zenith Bank" },
+];
+
 const Bill: React.FC = () => {
   const [tab, setTab] = useState(0);
-  const [addBill, setAddBill] = useState(false);
+  const [addCategory, setAddCategory] = useState(false);
+  const [payBill, setPayBill] = useState(false);
   const [seeAlert, setSeeAlert] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
   const tabs = ["Recurring Bills", "Non-recurring Bills"];
@@ -259,13 +293,13 @@ const Bill: React.FC = () => {
     </>
   );
 
-  const addBillForm = (
-    <div className="p-5 rounded-lg bg-[#fff] lg:w-[40vw] overflow-x-auto lg:h-[70vh] max-h-screen no-scrollbar">
+  const addCategoryForm = (
+    <div className="p-5 rounded-lg bg-[#fff] lg:w-[40vw] overflow-x-auto lg:max-h-[90vh] max-h-[90vh] no-scrollbar">
       <div className="flex justify-between pb-3 mb-5 border-b">
-        <h2 className="text-2xl text-gray-950 font-bold">New Bill</h2>
+        <h2 className="text-2xl text-gray-950 font-bold">New Category</h2>
         <button
           className=" text-customGray hover:text-customBlue"
-          onClick={() => setAddBill(false)}
+          onClick={() => setAddCategory(false)}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -283,28 +317,18 @@ const Bill: React.FC = () => {
         </button>
       </div>
       <div>
-        <div className="rounded-lg border p-3 mb-3">
-          <input
-            type="text"
-            placeholder="Title"
-            className="w-full focus:outline-none"
+        <div className="mb-3">
+          <InputGroup placeholder="e.g Electricity" label="Title" />
+        </div>
+        <div className="mb-3">
+          <SelectGroup
+            placeholder="Select"
+            label="Category"
+            options={allCategories.map((item) => item)}
           />
         </div>
-        <div className="rounded-lg border p-3 mb-3">
-          <select
-            name=""
-            id=""
-            className="w-full placeholder:bg-[#fff] bg-[#fff] focus:outline-none"
-          >
-            <option value="Category">Category</option>
-          </select>
-        </div>
-        <div className="rounded-lg border p-3 mb-3">
-          <input
-            type="text"
-            placeholder="Amount"
-            className="w-full focus:outline-none"
-          />
+        <div className="mb-3">
+          <InputGroup placeholder="1,000" label="Amount" />
         </div>
 
         <div className="rounded-lg p-3 mb-3 flex justify-between items-center">
@@ -378,12 +402,69 @@ const Bill: React.FC = () => {
             </div>
           </>
         )}
+        <div className="w-full">
+          <Button onClick={() => setAddCategory(false)}>Create</Button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const payBillForm = (
+    <div className="p-5 rounded-lg bg-[#fff] lg:w-[40vw] overflow-x-auto max-h-[90vh] no-scrollbar">
+      <div className="flex justify-between pb-3 mb-5 border-b">
+        <h2 className="text-2xl text-gray-950 font-bold">New Bill</h2>
         <button
-          onClick={() => setAddBill(false)}
-          className="flex justify-center items-center bg-customBlue text-white text-base font-medium py-3 px-4 rounded-lg hover:bg-opacity-80 w-full"
+          className=" text-customGray hover:text-customBlue"
+          onClick={() => setPayBill(false)}
         >
-          Create
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M12 11.0102L11.6465 10.6567L6.49494 5.50511C6.49492 5.50509 6.4949 5.50507 6.49488 5.50506C6.36362 5.37386 6.18563 5.30016 6.00004 5.30016C5.81447 5.30016 5.6365 5.37384 5.50524 5.505C5.50521 5.50504 5.50517 5.50507 5.50514 5.50511M12 11.0102L5.50514 5.50511M12 11.0102L12.3536 10.6567L17.5052 5.50506L17.5052 5.50511L17.5113 5.49886C17.5759 5.432 17.6531 5.37867 17.7385 5.34199C17.8239 5.3053 17.9158 5.28599 18.0087 5.28518C18.1016 5.28438 18.1938 5.30209 18.2798 5.33728C18.3659 5.37248 18.444 5.42446 18.5098 5.49018C18.5755 5.55591 18.6275 5.63406 18.6627 5.72009C18.6979 5.80612 18.7156 5.8983 18.7148 5.99124C18.7139 6.08418 18.6946 6.17604 18.658 6.26144C18.6213 6.34684 18.5679 6.42408 18.5011 6.48866L18.501 6.4886L18.4949 6.49475L13.3433 11.6463L12.9897 11.9999L13.3433 12.3535L18.4914 17.5016C18.6173 17.6333 18.6868 17.809 18.6853 17.9912C18.6837 18.1748 18.6101 18.3503 18.4803 18.4801C18.3505 18.6099 18.1749 18.6835 17.9914 18.6851C17.8091 18.6867 17.6335 18.6171 17.5017 18.4913L12.3536 13.3431L12 12.9896L11.6465 13.3431L6.49836 18.4913C6.36663 18.6171 6.19098 18.6867 6.0087 18.6851C5.82516 18.6835 5.64959 18.6099 5.51981 18.4801C5.39002 18.3503 5.3164 18.1748 5.31481 17.9912C5.31322 17.809 5.38281 17.6333 5.50867 17.5016L10.6568 12.3535L11.0103 11.9999L10.6568 11.6463L5.50524 6.4948M12 11.0102L5.50524 6.4948M5.50514 5.50511C5.37397 5.63637 5.30029 5.81434 5.30029 5.9999C5.30029 6.18549 5.37399 6.36348 5.50519 6.49475M5.50514 5.50511L5.50519 6.49475M5.50519 6.49475C5.50521 6.49477 5.50523 6.49478 5.50524 6.4948M5.50519 6.49475L5.50524 6.4948"
+              fill="currentColor"
+              stroke="currentColor"
+            />
+          </svg>
         </button>
+      </div>
+      <div>
+        <div className="mb-3">
+          <Card
+            title="Balance"
+            price={200000}
+            duration="Last Month"
+            percentage={5}
+            variant="#0784C7"
+          />
+        </div>
+        <div className="mb-3">
+          <SelectGroup
+            label="Reciepient Bank"
+            placeholder="Select"
+            options={allBanks.map((item) => item)}
+          />
+        </div>
+        <div className="mb-3">
+          <InputGroup
+            label="Recipient Account Number"
+            placeholder="1234567890"
+          />
+        </div>
+        <div className="mb-3">
+          <InputGroup label="Amount" placeholder="1,000" />
+        </div>
+        <div className="mb-3">
+          <InputGroup label="Description" />
+        </div>
+
+        <div className="w-full">
+          <Button onClick={() => setAddCategory(false)}>Proceed</Button>
+        </div>
       </div>
     </div>
   );
@@ -392,7 +473,7 @@ const Bill: React.FC = () => {
     <div className="p-5 rounded-lg bg-[#fff] lg:w-[40vw] overflow-x-auto no-scrollbar relative flex justify-center items-center flex-col">
       <button
         className="absolute right-5 top-5 text-customGray hover:text-customBlue"
-        onClick={() => setAddBill(false)}
+        onClick={() => setAddCategory(false)}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -411,19 +492,20 @@ const Bill: React.FC = () => {
       <div className="flex w-36 h-36">
         <Lottie lottie={LottieSuccess} />
       </div>
-      <p className="text-lg font-normal mb-6">Goal created Sucessfully</p>
+      <p className="lg:text-lg text-base text-gray-950 font-bold   mb-3">
+        Successful!
+      </p>
+      <p className="lg:text-lg text-base text-[#444] font-normal mb-6">
+        Your transaction was successful
+      </p>
       <button
-        onClick={() => setAddBill(false)}
+        onClick={() => setAddCategory(false)}
         className="flex justify-center items-center bg-customBlue text-white text-base font-medium py-3 px-4 rounded-lg hover:bg-opacity-80 w-full"
       >
         Done
       </button>
     </div>
   );
-
-  const handleCloseModal = () => {
-    setAddBill(false);
-  };
 
   return (
     <div className="rounded-lg bg-[#fff] w-full p-5">
@@ -444,10 +526,10 @@ const Bill: React.FC = () => {
           ))}
         </div>
         <button
-          onClick={() => setAddBill(true)}
+          onClick={() => setPayBill(true)}
           className="hidden lg:block bg-customBlue text-white text-base font-medium py-2 px-4 rounded-lg hover:bg-opacity-80"
         >
-          + New Bill
+          New Bill
         </button>
       </div>
       <p className="mb-5 text-customGray text-sm">
@@ -457,13 +539,34 @@ const Bill: React.FC = () => {
         {tab === 0 && recurringBills}
         {tab === 1 && nonRecurringBills}
       </div>
-      {addBill ? <Modal onClose={handleCloseModal}>{addBillForm}</Modal> : ""}
+      {addCategory && (
+        <Modal
+          onClose={() => {
+            setAddCategory(false);
+          }}
+        >
+          {addCategoryForm}
+        </Modal>
+      )}
+      {payBill && (
+        <Modal
+          onClose={() => {
+            setPayBill(false);
+          }}
+        >
+          {payBillForm}
+        </Modal>
+      )}
       <button
-        onClick={() => setAddBill(true)}
-        className="lg:hidden flex justify-center items-center bg-customBlue text-white text-base font-medium py-3 px-4 rounded-lg hover:bg-opacity-80 w-full"
+        onClick={() => setAddCategory(true)}
+        className="text-customBlue hover:opacity-80 font-medium mt-3 text-sm lg:text-base mb-5 lg:mb-0 flex items-center"
       >
-        + New Bill
+        <span className="mr-2 h-5 w-5">{addIcon}</span>Add New Category
       </button>
+
+      <div className="lg:hidden w-full">
+        <Button onClick={() => setPayBill(true)}>New Bill</Button>
+      </div>
     </div>
   );
 };

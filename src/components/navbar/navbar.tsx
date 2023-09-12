@@ -35,7 +35,7 @@ const navLinks = [
 ];
 const Navbar: React.FC = () => {
   const pathname = usePathname().split("/")[1];
-  const [isNotification, setIsNotification] = useState(true);
+  const [isNotification, setIsNotification] = useState(false);
 
   const navTitle = navLinks
     .filter(

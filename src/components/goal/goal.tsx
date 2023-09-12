@@ -24,7 +24,23 @@ const arrowIcon = (
     />
   </svg>
 );
-
+const cloudIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="40"
+    height="41"
+    viewBox="0 0 40 41"
+    fill="none"
+  >
+    <path
+      d="M11.6667 27.1665C10.025 27.1684 8.44042 26.5644 7.21645 25.4704C5.99247 24.3764 5.21519 22.8692 5.03352 21.2377C4.85184 19.6061 5.27855 17.9649 6.23189 16.6284C7.18523 15.2919 8.59817 14.3542 10.2 13.9949C9.73654 11.8334 10.1507 9.57627 11.3514 7.72013C12.5521 5.86399 14.441 4.56085 16.6025 4.09738C18.764 3.63392 21.0211 4.04809 22.8773 5.24879C24.7334 6.4495 26.0365 8.33837 26.5 10.4999H26.6667C28.7333 10.4978 30.7269 11.2637 32.2606 12.6488C33.7942 14.034 34.7585 15.9396 34.9662 17.9957C35.1739 20.0518 34.6102 22.1118 33.3845 23.7757C32.1588 25.4395 30.3586 26.5886 28.3333 26.9999M25 22.1665L20 17.1665M20 17.1665L15 22.1665M20 17.1665V37.1665"
+      stroke="#9CA0AF"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+);
 const goalsList = [
   {
     title: "iPhone 12",
@@ -194,7 +210,7 @@ const Goal: React.FC = () => {
   );
 
   const addGoalForm = (
-    <div className="lg:p-5 p-3 rounded-lg bg-[#fff] lg:w-[40vw] overflow-x-auto lg:h-[70vh] max-h-screen no-scrollbar">
+    <div className="lg:p-5 p-3 rounded-lg bg-[#fff] lg:w-[40vw] overflow-x-auto lg:max-h-[94vh] max-h-[80vh] no-scrollbar">
       <div className="flex justify-between pb-3 mb-5 border-b">
         <h2 className="text-2xl text-gray-950 font-bold">New Goal</h2>
         <button
@@ -217,20 +233,36 @@ const Goal: React.FC = () => {
         </button>
       </div>
       <div>
-        <div className="rounded-lg border p-3 mb-3">
-          <input
-            type="text"
-            placeholder="Title"
-            className="w-full focus:outline-none"
-          />
+        <div className="w-full">
+          <p className="text-base text-gray-950 mb-1">Title</p>
+          <div className="rounded-lg border p-3 mb-3">
+            <input
+              type="text"
+              placeholder="e.g vacation"
+              className="w-full focus:outline-none"
+            />
+          </div>
+        </div>
+        <div className="w-full">
+          <p className="text-base text-gray-950 mb-1">Amount</p>
+          <div className="rounded-lg border p-3 mb-3">
+            <input
+              type="text"
+              placeholder="e.g 1,000"
+              className="w-full focus:outline-none"
+            />
+          </div>
         </div>
 
-        <div className="rounded-lg border p-3 mb-3">
-          <input
-            type="text"
-            placeholder="Amount"
-            className="w-full focus:outline-none"
-          />
+        <div className="p-4 rounded-lg mb-3 w-full border border-dashed border-[#D2D2D2] flex justify-center items-center flex-col">
+          <p className="mb-[5px] text-customGray">{cloudIcon}</p>
+          <p className="text-customGray text-sm mb-[5px]">
+            Click to upload (Optional)
+          </p>
+          <p className="text-customGray text-xs mb-3">Max. File Size: 10MB</p>
+          <button className="py-2 px-3 w-1/2 border-customBlue rounded-lg border text-customBlue lg:hover:text-white lg:hover:bg-customBlue">
+            Browse File
+          </button>
         </div>
 
         <div className="rounded-lg p-3 mb-3 flex justify-between items-center">
@@ -283,6 +315,9 @@ const Goal: React.FC = () => {
                   className="w-full placeholder:bg-[#fff] bg-[#fff] focus:outline-none"
                 >
                   <option value="Category">Frequency</option>
+                  <option value="Weekly">Weekly</option>
+                  <option value="Monthly">Monthly</option>
+                  <option value="Yearly">Yearly</option>
                 </select>
               </div>
               <div className="rounded-lg border p-3 mb-3 w-full">
@@ -292,6 +327,8 @@ const Goal: React.FC = () => {
                   className="w-full placeholder:bg-[#fff] bg-[#fff] focus:outline-none"
                 >
                   <option value="Category">Ask before payment</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
                 </select>
               </div>
             </div>
@@ -330,7 +367,10 @@ const Goal: React.FC = () => {
       <div className="flex w-36 h-36">
         <Lottie lottie={LottieSuccess} />
       </div>
-      <p className="text-lg font-normal mb-6">Goal created Sucessfully</p>
+      <p className="lg:text-lg text-base font-bold mb-3">Successful!</p>
+      <p className="lg:text-lg text-base font-normal mb-6">
+        A new goal has been created.
+      </p>
       <button
         onClick={() => setAddGoal(false)}
         className="flex justify-center items-center bg-customBlue text-white text-base font-medium py-3 px-4 rounded-lg hover:bg-opacity-80 w-full"
@@ -364,7 +404,7 @@ const Goal: React.FC = () => {
         onClick={() => setAddGoal(true)}
         className="lg:hidden flex justify-center items-center bg-customBlue text-white text-base font-medium py-3 px-4 rounded-lg hover:bg-opacity-80 w-full"
       >
-        + New Bill
+        New Goal
       </button>
     </div>
   );
