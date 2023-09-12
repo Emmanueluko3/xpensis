@@ -4,7 +4,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import { Pagination } from "swiper/modules";
-import Card from "../cards/card";
+import Card from "../molecules/cards/card";
 
 const Finance: React.FC = () => {
   const financialCategories = [
