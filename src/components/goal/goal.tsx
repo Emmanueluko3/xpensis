@@ -25,7 +25,7 @@ const arrowIcon = (
   </svg>
 );
 
-const recentTransactions = [
+const goalsList = [
   {
     title: "iPhone 12",
     amount: 120000,
@@ -80,7 +80,7 @@ const Goal: React.FC = () => {
   const [tab, setTab] = useState(0);
   const [addGoal, setAddGoal] = useState(false);
   const [seeAlert, setSeeAlert] = useState(false);
-  const [isRecurring, setIsRecurring] = useState(false);
+  const [newGoal, setNewGoal] = useState(false);
   const tabs = ["Recurring Bills", "Non-recurring Bills"];
 
   const [currentYear, setCurrentYear] = useState<number>(
@@ -150,7 +150,7 @@ const Goal: React.FC = () => {
 
   const allGoals = (
     <>
-      {recentTransactions.map((item, index) => (
+      {goalsList.map((item, index) => (
         <div
           key={index}
           className="py-4 border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"
@@ -237,12 +237,9 @@ const Goal: React.FC = () => {
           <p className="text-base text-customGray font-normal">
             Make Recurring
           </p>
-          <Switch
-            onChange={() => setIsRecurring(!isRecurring)}
-            checked={isRecurring}
-          />
+          <Switch onChange={() => setNewGoal(!newGoal)} checked={newGoal} />
         </div>
-        {isRecurring && (
+        {newGoal && (
           <>
             <div className="my-4 p-3 rounded-lg border-2">
               <div className="flex justify-between items-center mb-2">

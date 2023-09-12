@@ -26,13 +26,21 @@ const FormSection: React.FC = () => {
   const [isUser, setIsUser] = useState(true);
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
-  const [location, setLocation] = useState("");
   const [password, setPassword] = useState("");
   const [checked, setChecked] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPasswordVisible, setConfirmPasswordVisible] =
+    useState<boolean>(false);
   const [notificationScreen, setNotificationScreen] = useState<boolean>(false);
   const [enableNotifications, setEnableNotifications] = useState(false);
+
+  // error handling
+  const [errorEmail, setErrorEmail] = useState("");
+  const [errorFullName, setErrorFullName] = useState("");
+  const [errorPassword, setErrorPassword] = useState("");
+  const [errorConfirmPassword, setErrorConfirmPassword] = useState("");
 
   const registredModal = (
     <div className="p-5 rounded-lg bg-[#fff] lg:w-[40vw] w-[95%] overflow-x-auto no-scrollbar relative flex justify-center items-center flex-col">
@@ -67,6 +75,23 @@ const FormSection: React.FC = () => {
       )}
     </div>
   );
+
+  const handleSignup = () => {
+    if (!email) {
+      setErrorEmail("Please enter your email address.");
+    }
+    if (!fullName) {
+      setErrorFullName("Please enter your full name.");
+    }
+    if (!password) {
+      setErrorPassword("Please enter your password.");
+    }
+    if (password && !confirmPassword) {
+      setErrorConfirmPassword("Please confirm your password.");
+    } else if (password !== confirmPassword) {
+      setErrorConfirmPassword("Password does not match, please re-enter.");
+    }
+  };
 
   return (
     <div className="w-full h-screen">
@@ -119,19 +144,33 @@ const FormSection: React.FC = () => {
               }`}
             >
               <p className="mb-2 text-base text-gray-950">Email</p>
-              <Input type="email" placeholder="enodivinesamuel@gmail.com" />
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="enodivinesamuel@gmail.com"
+              />
+              {!email && (
+                <p className="w-full flex col-span-2 text-customRed text-xs">
+                  {errorEmail}
+                </p>
+              )}
             </div>
             {!isUser && (
-              <>
-                <div className="w-full col-span-2 lg:col-span-1">
-                  <p className="mb-2 text-base text-gray-950">Full Name</p>
-                  <Input type="email" placeholder="Divine Samuel" />
-                </div>
-                <div className="w-full col-span-2 lg:col-span-1">
-                  <p className="mb-2 text-base text-gray-950">Location</p>
-                  <Input type="email" placeholder="Divine Samuel" />
-                </div>
-              </>
+              <div className="w-full col-span-2 lg:col-span-1">
+                <p className="mb-2 text-base text-gray-950">Full Name</p>
+                <Input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Divine Samuel"
+                />
+                {!fullName && (
+                  <p className="w-full flex col-span-2 text-customRed text-xs">
+                    {errorFullName}
+                  </p>
+                )}
+              </div>
             )}
             <div
               className={`w-full  ${
@@ -142,6 +181,8 @@ const FormSection: React.FC = () => {
               <div className="relative">
                 <Input
                   type={passwordVisible ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder={passwordVisible ? "123456" : "******"}
                 />
                 <button
@@ -152,6 +193,42 @@ const FormSection: React.FC = () => {
                 </button>
               </div>
             </div>
+
+            {!isUser && (
+              <div
+                className={`w-full  ${
+                  isUser ? "col-span-2" : "col-span-2 lg:col-span-1"
+                }`}
+              >
+                <p className="mb-2 text-base text-gray-950">Confirm Password</p>
+                <div className="relative">
+                  <Input
+                    type={confirmPasswordVisible ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder={confirmPasswordVisible ? "123456" : "******"}
+                  />
+                  <button
+                    onClick={() =>
+                      setConfirmPasswordVisible(!confirmPasswordVisible)
+                    }
+                    className="absolute right-4 top-2"
+                  >
+                    {confirmPasswordVisible ? inVisibleIcon : visibleIcon}
+                  </button>
+                </div>
+              </div>
+            )}
+            {!password && (
+              <p className="w-full flex col-span-2 text-customRed text-xs">
+                {errorPassword}
+              </p>
+            )}
+            {password && !confirmPassword && (
+              <p className="w-full flex col-span-2 text-customRed text-xs">
+                {errorConfirmPassword}
+              </p>
+            )}
             <div className="w-full mb-4 flex col-span-2">
               <div className="h-4 w-4 mr-2">
                 <Input
@@ -190,7 +267,7 @@ const FormSection: React.FC = () => {
               </div>
             ) : (
               <div className="col-span-2">
-                <Button>Sign Up</Button>
+                <Button onClick={() => handleSignup()}>Sign Up</Button>
               </div>
             )}
           </div>

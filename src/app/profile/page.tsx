@@ -1,7 +1,7 @@
 import Navbar from "@/components/navbar/navbar";
 import Sidebar from "@/components/sidebar/sidebar";
 
-export default function Dashboard() {
+export default function Profile() {
   return (
     <div className="flex lg:pl-8 lg:px-0 bg-white">
       <div>

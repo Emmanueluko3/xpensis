@@ -28,7 +28,7 @@ const notificationIcon = (
 );
 
 const navLinks = [
-  { label: "Dashboard", href: "dashboard" },
+  { label: "Dashboard", href: "/" },
   { label: "Bills", href: "bills" },
   { label: "Goals", href: "goals" },
   { label: "Profile", href: "profile" },
@@ -38,7 +38,9 @@ const Navbar: React.FC = () => {
   const [isNotification, setIsNotification] = useState(true);
 
   const navTitle = navLinks
-    .filter((item) => item.href === pathname)
+    .filter(
+      (item) => item.href === pathname || (item.href === "/" && pathname === "")
+    )
     .map((item) => item.label);
 
   return (

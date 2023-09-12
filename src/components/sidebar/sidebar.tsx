@@ -90,7 +90,7 @@ const Sidebar: React.FC = () => {
   const pathname = usePathname().split("/")[1];
 
   const navLinks = [
-    { icon: dashboardIcon, label: "Dashboard", href: "/dashboard" },
+    { icon: dashboardIcon, label: "Dashboard", href: "/" },
     { icon: billsIcon, label: "Bills", href: "/bills" },
     { icon: goalsIcon, label: "Goals", href: "/goals" },
     { icon: profileIcon, label: "Profile", href: "/profile" },
@@ -152,7 +152,8 @@ const Sidebar: React.FC = () => {
           <Link href={link.href} key={index} className="my-3">
             <h3
               className={`p-2 rounded-lg ${
-                "/" + pathname === link.href
+                "/" + pathname === link.href ||
+                (link.href === "/" && pathname === "")
                   ? "text-customBlue bg-customBlue bg-opacity-10"
                   : "text-customGray"
               } flex items-center font-bold text-base`}
