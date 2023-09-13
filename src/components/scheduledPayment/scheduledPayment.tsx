@@ -16,12 +16,9 @@ const ScheduledPayment: React.FC = () => {
         <h3 className="text-gray-950 font-bold text-base">
           Scheduled Payments
         </h3>
-        <button className="text-sm text-customGray1 hover:text-gray-700">
-          View all
-        </button>
       </div>
 
-      <div className="overflow-x-auto max-w-[250px] no-scrollbar lg:max-w-full grid grid-flow-col gap-3">
+      <div className="overflow-x-auto max-w-[310px] no-scrollbar lg:max-w-full grid grid-flow-col gap-3">
         {scheduledBills.map((item, index) => (
           <div
             key={index}
