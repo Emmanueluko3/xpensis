@@ -9,6 +9,8 @@ import Button from "@/components/atoms/button";
 import Lottie from "@/components/atoms/lottie";
 import LottieSuccess from "@/../public/assets/lotties/lottieSuccess.json";
 import LottieNotification from "@/../public/assets/lotties/lottieNotification.json";
+import { getCsrfToken, signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const visibleIcon = (
   <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 576 512">
@@ -23,6 +25,8 @@ const inVisibleIcon = (
 );
 
 const FormSection: React.FC = () => {
+  const session = useSession();
+  const router = useRouter();
   const [isUser, setIsUser] = useState(true);
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
@@ -93,6 +97,47 @@ const FormSection: React.FC = () => {
     }
   };
 
+  const handleSignin = async () => {
+    if (!email) {
+      setErrorEmail("Please enter your email address.");
+    }
+    if (!password) {
+      setErrorPassword("Please enter your password.");
+    } else {
+      try {
+        const credentials = {
+          email,
+          password,
+          redirect: false,
+          csrfToken: await getCsrfToken(),
+        };
+        signIn("credentials", credentials);
+        rememberMe
+          ? localStorage.setItem(
+              "userCredentials",
+              JSON.stringify({ email, password })
+            )
+          : localStorage.removeItem("userCredentials");
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  // remember me credentials
+  useEffect(() => {
+    const storedCredentials = localStorage.getItem("userCredentials");
+    if (storedCredentials) {
+      const { email: storedEmail, password: storedPassword } =
+        JSON.parse(storedCredentials);
+      setEmail(storedEmail);
+      setPassword(storedPassword);
+    }
+    if (session) {
+      router.push("/");
+    }
+  }, []);
+
   return (
     <div className="w-full h-screen">
       <div className="flex justify-center items-center flex-row z-50 px-6 py-6 w-full bg-white">
@@ -147,7 +192,7 @@ const FormSection: React.FC = () => {
               <Input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value.toLowerCase())}
                 placeholder="enodivinesamuel@gmail.com"
               />
               {!email && (
@@ -230,23 +275,39 @@ const FormSection: React.FC = () => {
               </p>
             )}
             <div className="w-full mb-4 flex col-span-2">
-              <div className="h-4 w-4 mr-2">
-                <Input
-                  checked={checked}
-                  onChange={() => setChecked(!checked)}
-                  type="checkbox"
-                  id="checkbox"
-                  className="rounded-md"
-                />
-              </div>
-              <label
-                htmlFor="checkbox"
-                className=" text-customGray1 text-[12px]"
-              >
-                {isUser ? (
-                  "Remember me"
-                ) : (
-                  <>
+              {isUser ? (
+                <>
+                  <div className="h-4 w-4 mr-2">
+                    <Input
+                      checked={rememberMe}
+                      onChange={() => setRememberMe(!rememberMe)}
+                      type="checkbox"
+                      id="checkbox"
+                      className="rounded-md cursor-pointer"
+                    />
+                  </div>
+                  <label
+                    htmlFor="checkbox"
+                    className=" text-customGray1 text-[12px]"
+                  >
+                    Remember me
+                  </label>
+                </>
+              ) : (
+                <>
+                  <div className="h-4 w-4 mr-2">
+                    <Input
+                      checked={checked}
+                      onChange={() => setChecked(!checked)}
+                      type="checkbox"
+                      id="terms"
+                      className="rounded-md"
+                    />
+                  </div>
+                  <label
+                    htmlFor="terms"
+                    className=" text-customGray1 text-[12px]"
+                  >
                     By signing up, you are creating a PrimePicks account, and
                     you agree to our{" "}
                     <Link href="" className="text-customBlue font-medium">
@@ -257,13 +318,13 @@ const FormSection: React.FC = () => {
                       Privacy Policy
                     </Link>
                     .
-                  </>
-                )}
-              </label>
+                  </label>
+                </>
+              )}
             </div>
             {isUser ? (
               <div className="col-span-2">
-                <Button>Login</Button>
+                <Button onClick={() => handleSignin()}>Login</Button>
               </div>
             ) : (
               <div className="col-span-2">

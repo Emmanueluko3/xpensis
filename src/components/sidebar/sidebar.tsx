@@ -5,6 +5,7 @@ import Link from "next/link";
 import Xpensis from "@/../public/assets/images/Xpensis.svg";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 const dashboardIcon = (
   <svg
@@ -124,7 +125,10 @@ const Sidebar: React.FC = () => {
             </Link>
           ))}
 
-          <button className="flex items-center font-bold text-customGray hover:text-customBlue px-5 py-2 mt-20">
+          <button
+            onClick={async () => await signOut({ redirect: true })}
+            className="flex items-center font-bold text-customGray hover:text-customBlue px-5 py-2 mt-20"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"

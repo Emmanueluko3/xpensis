@@ -7,6 +7,7 @@ import ProfilePics from "@/../public/assets/images/ProfilePics.svg";
 import Xpensis from "@/../public/assets/images/Xpensis.svg";
 import LottieNotification from "@/../public/assets/lotties/lottieNotification.json";
 import Lottie from "../atoms/lottie";
+import { useSession } from "next-auth/react";
 
 const notificationIcon = (
   <svg
@@ -37,6 +38,9 @@ const Navbar: React.FC = () => {
   const pathname = usePathname().split("/")[1];
   const [isNotification, setIsNotification] = useState(false);
 
+  const { data: session }: any = useSession();
+  const fullName = session?.user?.items[0]?.fullName;
+
   const navTitle = navLinks
     .filter(
       (item) => item.href === pathname || (item.href === "/" && pathname === "")
@@ -66,7 +70,7 @@ const Navbar: React.FC = () => {
                   alt="Profile"
                 />
               </div>
-              <h3 className="text-base font-normal">Divine</h3>
+              <h3 className="text-base font-normal">{fullName}</h3>
             </div>
           </Link>
         </div>

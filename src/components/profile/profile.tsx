@@ -7,6 +7,7 @@ import SelectGroup from "../molecules/inputGroup/selectGroup";
 import Button from "../atoms/button";
 import Card from "../molecules/cards/card";
 import Switch from "../atoms/switch";
+import { useSession } from "next-auth/react";
 
 const plusIcon = (
   <svg
@@ -114,6 +115,10 @@ const allNotifications = [
 ];
 
 const ProfileComponent: React.FC = () => {
+  const { data: session }: any = useSession();
+  const fullName = session?.user?.items[0]?.fullName;
+  const userEmail = session?.user?.items[0]?.email;
+
   const [profileTab, setProfileTab] = useState("Account Settings");
   const [settingsScreen, setSettingsScreen] = useState(false);
   const profileMenu = ["Account Settings", "Notifications", "Change Password"];
@@ -144,10 +149,8 @@ const ProfileComponent: React.FC = () => {
             />
           </div>
           <div className="flex flex-col items-center lg:items-start">
-            <h2 className="text-gray-950 text-lg font-bold">
-              Emmanuel Stephen
-            </h2>
-            <p className=" text-gray-800 text-sm">emmanueluko90@gmail.com</p>
+            <h2 className="text-gray-950 text-lg font-bold">{fullName}</h2>
+            <p className=" text-gray-800 text-sm">{userEmail}</p>
           </div>
         </div>
         <div className="my-7">

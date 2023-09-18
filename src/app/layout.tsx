@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Logo from "./../../public/xpensis.svg";
+import { Providers } from "@/providers/provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -19,8 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div id="modal" className="z-[2147483647]"></div>
-        {children}
+        <Providers>
+          <div id="modal" className="z-[2147483647]"></div>
+          {children}
+        </Providers>
       </body>
     </html>
   );
