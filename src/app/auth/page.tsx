@@ -25,7 +25,9 @@ const inVisibleIcon = (
 );
 
 const FormSection: React.FC = () => {
-  const session = useSession();
+  const { data: session }: any = useSession();
+  const sessionData =
+    session?.user?.items !== null && session?.user?.items.length > 0;
   const router = useRouter();
   const [isUser, setIsUser] = useState(true);
   const [email, setEmail] = useState("");
@@ -94,6 +96,7 @@ const FormSection: React.FC = () => {
       setErrorConfirmPassword("Please confirm your password.");
     } else if (password !== confirmPassword) {
       setErrorConfirmPassword("Password does not match, please re-enter.");
+    } else {
     }
   };
 
@@ -133,10 +136,10 @@ const FormSection: React.FC = () => {
       setEmail(storedEmail);
       setPassword(storedPassword);
     }
-    if (session) {
+    if (session && sessionData) {
       router.push("/");
     }
-  }, []);
+  }, [session]);
 
   return (
     <div className="w-full h-screen">

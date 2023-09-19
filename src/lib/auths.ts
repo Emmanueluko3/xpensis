@@ -32,12 +32,15 @@ export const authOptions: NextAuthOptions = {
         try {
           const { response: user } = await findOneUser(email);
 
-          if (user) {
+          if (user.items !== null && user.items.length > 0) {
             return user;
+          } else {
+            throw new Error();
           }
         } catch (error) {
           console.error(error);
         }
+
         return null;
       },
     }),
