@@ -41,12 +41,17 @@ const FormSection: React.FC = () => {
     useState<boolean>(false);
   const [notificationScreen, setNotificationScreen] = useState<boolean>(false);
   const [enableNotifications, setEnableNotifications] = useState(false);
-
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    return emailRegex.test(email);
+  };
   // error handling
   const [errorEmail, setErrorEmail] = useState("");
   const [errorFullName, setErrorFullName] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
   const [errorConfirmPassword, setErrorConfirmPassword] = useState("");
+  const [passwordMismatchError, setPasswordMismatchError] = useState("");
+  const [validEmail, setValidEmail] = useState("");
 
   const registredModal = (
     <div className="p-5 rounded-lg bg-[#fff] lg:w-[40vw] w-[95%] overflow-x-auto no-scrollbar relative flex justify-center items-center flex-col">
@@ -82,21 +87,60 @@ const FormSection: React.FC = () => {
     </div>
   );
 
-  const handleSignup = () => {
-    if (!email) {
+  const handleSignup = async () => {
+    const isMatch = password === confirmPassword;
+
+    if (email === "") {
       setErrorEmail("Please enter your email address.");
+      return;
     }
-    if (!fullName) {
+    if (!validateEmail(email)) {
+      setValidEmail("Please enter a valid email address.");
+      return;
+    }
+    if (fullName === "") {
       setErrorFullName("Please enter your full name.");
+      return;
     }
-    if (!password) {
+    if (password === "") {
       setErrorPassword("Please enter your password.");
+      return;
     }
     if (password && !confirmPassword) {
       setErrorConfirmPassword("Please confirm your password.");
-    } else if (password !== confirmPassword) {
-      setErrorConfirmPassword("Password does not match, please re-enter.");
-    } else {
+      return;
+    }
+    if (password && confirmPassword && !isMatch) {
+      setPasswordMismatchError("Password does not match, please re-enter.");
+      return;
+    }
+
+    try {
+      const userData = {
+        email: email,
+        fullName: fullName,
+        password: password,
+      };
+
+      console.log("userData is: " + userData);
+
+      const registeredUser = await (
+        await fetch("api/register", {
+          method: "POST",
+          body: JSON.stringify(userData),
+        })
+      ).json();
+
+      console.log("registeredUser", registeredUser);
+
+      const credentials = {
+        email,
+        password,
+        redirect: false,
+      };
+      await signIn("credentials", credentials);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -203,6 +247,11 @@ const FormSection: React.FC = () => {
                   {errorEmail}
                 </p>
               )}
+              {validEmail && email && (
+                <p className="w-full flex col-span-2 text-customRed text-xs">
+                  {validEmail}
+                </p>
+              )}
             </div>
             {!isUser && (
               <div className="w-full col-span-2 lg:col-span-1">
@@ -277,6 +326,13 @@ const FormSection: React.FC = () => {
                 {errorConfirmPassword}
               </p>
             )}
+            {confirmPassword &&
+              passwordMismatchError &&
+              password !== confirmPassword && (
+                <p className="w-full flex col-span-2 text-customRed text-xs">
+                  {passwordMismatchError}
+                </p>
+              )}
             <div className="w-full mb-4 flex col-span-2">
               {isUser ? (
                 <>

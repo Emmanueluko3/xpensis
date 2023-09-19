@@ -1,8 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { findOneUser } from "./outerbase/users";
-
-// import { compare } from "bcrypt";
+import { compare } from "bcrypt";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -31,11 +30,19 @@ export const authOptions: NextAuthOptions = {
 
         try {
           const { response: user } = await findOneUser(email);
-
-          if (user.items !== null && user.items.length > 0) {
+          if (
+            user.items !== null &&
+            user.items.length > 0 &&
+            (await compare(
+              password,
+              user.items.find((item: any) => item.passwordHash).passwordHash
+            ))
+          ) {
+            delete user.items.find((item: any) => item.passwordHash)
+              .passwordHash;
             return user;
           } else {
-            throw new Error();
+            throw new Error("Invalid Email or Password");
           }
         } catch (error) {
           console.error(error);
@@ -66,8 +73,3 @@ export const authOptions: NextAuthOptions = {
     signIn: "/auth",
   },
 };
-
-// if (user && (await compare(password, user.passwordHash))) {
-//   let { passwordHash, ...userObject } = user;
-//   return userObject;
-// }

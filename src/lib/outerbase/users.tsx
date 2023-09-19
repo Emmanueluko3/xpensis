@@ -1,9 +1,9 @@
 const dbUrl = process.env.OUTERBASE_API_URL;
 
-export async function createUser(user: {
+export async function createUser(userData: {
   email: string;
   fullName: string;
-  password: string;
+  passwordHash: string;
 }) {
   try {
     const response = await fetch(`${dbUrl}/signup`, {
@@ -11,7 +11,7 @@ export async function createUser(user: {
       headers: {
         "content-type": "application/json",
       },
-      body: '{"password":"emmanuel1234","fullName":"Emmanuel Stephen","email":"emmanueluko4@gmail.com"}',
+      body: `${JSON.stringify(userData)}`,
     });
     return response.json();
   } catch (error) {

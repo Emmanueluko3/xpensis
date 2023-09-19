@@ -7,7 +7,7 @@ import SelectGroup from "../molecules/inputGroup/selectGroup";
 import Button from "../atoms/button";
 import Card from "../molecules/cards/card";
 import Switch from "../atoms/switch";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 const plusIcon = (
   <svg
@@ -164,11 +164,11 @@ const ProfileComponent: React.FC = () => {
             />
           </div>
           <button className="flex items-center justify-center w-full py-3 px-6 mr-5 text-customBlue border border-customBlue rounded-lg hover:bg-customBlue hover:text-white">
-            <span className="mr-2">{plusIcon}</span>Cancel
+            <span className="mr-2">{plusIcon}</span>Top Up
           </button>
         </div>
 
-        <div className="w-full mb-7">
+        <div className="w-full lg:mb-7 mb-4">
           {profileMenu.map((item, index) => (
             <div
               onClick={() => {
@@ -185,6 +185,29 @@ const ProfileComponent: React.FC = () => {
             </div>
           ))}
         </div>
+        <button
+          onClick={async () => await signOut({ redirect: true })}
+          className="flex items-center font-bold text-customGray after:text-customBlue py-2 mb-3 lg:hidden"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="mr-3"
+          >
+            <path
+              d="M16.8 2H14.2C11 2 9 4 9 7.2V11.25H15.25C15.66 11.25 16 11.59 16 12C16 12.41 15.66 12.75 15.25 12.75H9V16.8C9 20 11 22 14.2 22H16.79C19.99 22 21.99 20 21.99 16.8V7.2C22 4 20 2 16.8 2Z"
+              fill="currentColor"
+            />
+            <path
+              d="M4.56 11.25L6.63 9.18003C6.78 9.03003 6.85 8.84003 6.85 8.65003C6.85 8.46003 6.78 8.26003 6.63 8.12003C6.34 7.83003 5.86 7.83003 5.57 8.12003L2.22 11.47C1.93 11.76 1.93 12.24 2.22 12.53L5.57 15.88C5.86 16.17 6.34 16.17 6.63 15.88C6.92 15.59 6.92 15.11 6.63 14.82L4.56 12.75H9V11.25H4.56Z"
+              fill="currentColor"
+            />
+          </svg>
+          Logout
+        </button>
         <button className="flex items-center text-customRed hover:opacity-80">
           <span className="mr-2">{trashIcon}</span> Delete Account
         </button>
