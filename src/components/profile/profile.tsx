@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProfilePics from "@/../public/assets/images/mee2.jpg";
 import InputGroup from "../molecules/inputGroup/inputGroup";
 import SelectGroup from "../molecules/inputGroup/selectGroup";
@@ -8,6 +8,7 @@ import Button from "../atoms/button";
 import Card from "../molecules/cards/card";
 import Switch from "../atoms/switch";
 import { signOut, useSession } from "next-auth/react";
+import { UserProfile } from "@/lib/outerbase/users";
 
 const plusIcon = (
   <svg
@@ -116,8 +117,16 @@ const allNotifications = [
 
 const ProfileComponent: React.FC = () => {
   const { data: session }: any = useSession();
-  const fullName = session?.user?.items[0]?.fullName;
-  const userEmail = session?.user?.items[0]?.email;
+
+  const userId = session?.user?.items[0]?.userId;
+  const [userData, setUserData] = useState<any>([]);
+  const [fullName, setFullName] = useState(userData[0]?.fullName);
+  const [email, setEmail] = useState(userData[0]?.email);
+  const [phoneNumber, setPhoneNumber] = useState(userData[0]?.phoneNumber);
+  const [country, setCountry] = useState(userData[0]?.country);
+  const [state, setState] = useState(userData[0]?.state);
+  const [city, setCity] = useState(userData[0]?.city);
+  // console.log("user is ", fullName, userData);
 
   const [profileTab, setProfileTab] = useState("Account Settings");
   const [settingsScreen, setSettingsScreen] = useState(false);
@@ -132,6 +141,17 @@ const ProfileComponent: React.FC = () => {
     newNotificationStates[index] = !newNotificationStates[index];
     setNotificationStates(newNotificationStates);
   };
+
+  useEffect(() => {
+    UserProfile(userId?.toString())
+      .then((data) => {
+        setUserData(data.item.items);
+        setFullName(data.item.items[0]?.fullName);
+      })
+      .catch((error) => {
+        console.error("Error fetching user profile:", error);
+      });
+  }, [userId]);
 
   return (
     <div className="grid grid-flow-row grid-cols-5 gap-3">
@@ -149,8 +169,10 @@ const ProfileComponent: React.FC = () => {
             />
           </div>
           <div className="flex flex-col items-center lg:items-start">
-            <h2 className="text-gray-950 text-lg font-bold">{fullName}</h2>
-            <p className=" text-gray-800 text-sm">{userEmail}</p>
+            <h2 className="text-gray-950 text-lg font-bold">
+              {userData[0]?.fullName}
+            </h2>
+            <p className=" text-gray-800 text-sm">{userData[0]?.email}</p>
           </div>
         </div>
         <div className="my-7">
@@ -232,6 +254,8 @@ const ProfileComponent: React.FC = () => {
               <div>
                 <InputGroup
                   label="Full Name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   placeholder="Emmanuel Stephen"
                   type="text"
                 />
@@ -239,6 +263,8 @@ const ProfileComponent: React.FC = () => {
               <div>
                 <InputGroup
                   label="Email Address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value.toLowerCase())}
                   placeholder="emmanueluko90@gmail.com"
                   type="email"
                 />
@@ -246,6 +272,8 @@ const ProfileComponent: React.FC = () => {
               <div>
                 <InputGroup
                   label="Phone Number"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
                   placeholder="+2347031982590"
                   type="text"
                 />
@@ -277,7 +305,7 @@ const ProfileComponent: React.FC = () => {
                 Cancel
               </button>
               <div>
-                <Button>Save Changes</Button>
+                <Button className=" cursor-not-allowed">Save Changes</Button>
               </div>
             </div>
           </div>

@@ -33,3 +33,21 @@ export async function findOneUser(email: string) {
     return error;
   }
 }
+
+export async function UserProfile(userId: string) {
+  try {
+    const response = await fetch(
+      `https://fantastic-beige.cmd.outerbase.io/profile`,
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: `${JSON.stringify({ userId: userId, api_key: "mykey" })}`,
+      }
+    );
+    return response.json();
+  } catch (error) {
+    return error;
+  }
+}
