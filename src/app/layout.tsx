@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Providers } from "@/providers/provider";
 const inter = Inter({ subsets: ["latin"] });
+import toast, { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Xpensis",
@@ -20,6 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
+          <Toaster />
           <div id="modal" className="z-[2147483647]"></div>
           {children}
         </Providers>

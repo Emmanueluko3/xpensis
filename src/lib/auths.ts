@@ -1,6 +1,6 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { findOneUser } from "./outerbase/users";
+import { findOneUser } from "./outerbase/allCommands";
 import { compare } from "bcrypt";
 
 export const authOptions: NextAuthOptions = {

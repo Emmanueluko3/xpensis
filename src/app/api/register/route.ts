@@ -1,4 +1,4 @@
-import { createUser } from "@/lib/outerbase/users";
+import { createUser } from "@/lib/outerbase/allCommands";
 import { NextResponse } from "next/server";
 import { hashSync } from "bcrypt";
 

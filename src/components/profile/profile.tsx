@@ -1,14 +1,14 @@
 "use client";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import ProfilePics from "@/../public/assets/images/mee2.jpg";
+import ProfilePics from "@/../public/assets/images/ProfilePics.webp";
 import InputGroup from "../molecules/inputGroup/inputGroup";
 import SelectGroup from "../molecules/inputGroup/selectGroup";
 import Button from "../atoms/button";
 import Card from "../molecules/cards/card";
 import Switch from "../atoms/switch";
 import { signOut, useSession } from "next-auth/react";
-import { UserProfile } from "@/lib/outerbase/users";
+import { UserProfile } from "@/lib/outerbase/allCommands";
 
 const plusIcon = (
   <svg
@@ -98,7 +98,6 @@ const arrowIcon = (
 
 const allCountries = [
   { value: "United States", label: "United States" },
-  { value: "Nigeria", label: "Nigeria" },
   { value: "Ghana", label: "Ghana" },
 ];
 
@@ -115,18 +114,19 @@ const allNotifications = [
   { type: "Email Notifications", description: "Get notified via email" },
 ];
 
-const ProfileComponent: React.FC = () => {
-  const { data: session }: any = useSession();
+interface userProfileComponentProps {
+  userData: any;
+}
 
-  const userId = session?.user?.items[0]?.userId;
-  const [userData, setUserData] = useState<any>([]);
-  const [fullName, setFullName] = useState(userData[0]?.fullName);
-  const [email, setEmail] = useState(userData[0]?.email);
-  const [phoneNumber, setPhoneNumber] = useState(userData[0]?.phoneNumber);
-  const [country, setCountry] = useState(userData[0]?.country);
-  const [state, setState] = useState(userData[0]?.state);
-  const [city, setCity] = useState(userData[0]?.city);
-  // console.log("user is ", fullName, userData);
+const ProfileComponent: React.FC<userProfileComponentProps> = ({
+  userData,
+}) => {
+  const [fullName, setFullName] = useState(userData.fullName);
+  const [email, setEmail] = useState(userData.email);
+  const [phoneNumber, setPhoneNumber] = useState(userData.phoneNumber);
+  const [country, setCountry] = useState(userData.country);
+  const [state, setState] = useState(userData.state);
+  const [city, setCity] = useState(userData.city);
 
   const [profileTab, setProfileTab] = useState("Account Settings");
   const [settingsScreen, setSettingsScreen] = useState(false);
@@ -142,17 +142,6 @@ const ProfileComponent: React.FC = () => {
     setNotificationStates(newNotificationStates);
   };
 
-  useEffect(() => {
-    UserProfile(userId?.toString())
-      .then((data) => {
-        setUserData(data.item.items);
-        setFullName(data.item.items[0]?.fullName);
-      })
-      .catch((error) => {
-        console.error("Error fetching user profile:", error);
-      });
-  }, [userId]);
-
   return (
     <div className="grid grid-flow-row grid-cols-5 gap-3">
       <div
@@ -163,16 +152,20 @@ const ProfileComponent: React.FC = () => {
         <div className="flex items-center lg:items-end flex-col lg:flex-row">
           <div className=" w-28 h-28 lg:mr-5 mb-5 lg:mb-0">
             <Image
-              src={ProfilePics}
+              src={
+                userData.profilePicture ? userData.profilePicture : ProfilePics
+              }
+              width={500}
+              height={500}
               className="w-full h-full rounded-lg"
               alt="Profile Picture"
             />
           </div>
           <div className="flex flex-col items-center lg:items-start">
             <h2 className="text-gray-950 text-lg font-bold">
-              {userData[0]?.fullName}
+              {userData?.fullName}
             </h2>
-            <p className=" text-gray-800 text-sm">{userData[0]?.email}</p>
+            <p className=" text-gray-800 text-sm">{userData?.email}</p>
           </div>
         </div>
         <div className="my-7">
@@ -282,6 +275,8 @@ const ProfileComponent: React.FC = () => {
                 <SelectGroup
                   label="Country"
                   placeholder="Nigeria"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
                   options={allCountries.map((item) => item)}
                 />
               </div>
@@ -289,13 +284,17 @@ const ProfileComponent: React.FC = () => {
                 <SelectGroup
                   label="State"
                   placeholder="Akwa Ibom"
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
                   options={allCountries.map((item) => item)}
                 />
               </div>
               <div>
                 <SelectGroup
-                  label="Local Goverment"
-                  placeholder="Ini"
+                  label="City"
+                  placeholder="city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
                   options={allCountries.map((item) => item)}
                 />
               </div>
