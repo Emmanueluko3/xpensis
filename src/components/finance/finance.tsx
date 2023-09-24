@@ -1,43 +1,58 @@
 "use client";
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import { Pagination } from "swiper/modules";
 import Card from "../molecules/cards/card";
+import { useSession } from "next-auth/react";
+import { FinancialData } from "@/lib/outerbase/allCommands";
 
 const Finance: React.FC = () => {
+  const { data: session }: any = useSession();
+
+  const userId = session?.user?.items[0]?.userId;
+  const [financialData, setFinancialData] = useState([]);
+  console.log("Financial Data", financialData);
+  useEffect(() => {
+    async function fetchFinancialData() {
+      try {
+        const data = await FinancialData(userId?.toString());
+        setFinancialData(data);
+      } catch (error) {
+        console.error("Error in fetchFinancialData:", error);
+      }
+    }
+    fetchFinancialData();
+  }, [userId]);
   const financialCategories = [
     {
-      title: "Balance",
-      price: 200000,
       duration: "Last Month",
-      percentage: 5,
       variant: "#0784C7",
     },
     {
-      title: "Expenses",
-      price: 200000,
       duration: "Last Month",
-      percentage: 10,
       variant: "#3D315B",
     },
     {
-      title: "Savings",
-      price: 200000,
       duration: "Last Month",
-      percentage: 5,
       variant: "#F75C03",
     },
   ];
+
+  const mergedData: any = financialData.map((item: any, index) => ({
+    ...item,
+    ...financialCategories[index],
+  }));
+
   return (
     <>
       <div className="lg:grid grid-flow-row lg:grid-cols-3 gap-3 hidden">
-        {financialCategories.map((item, index) => (
+        {mergedData.map((item: any, index: any) => (
           <Card
             key={index}
             title={item.title}
-            price={item.price}
+            price={item.balance}
             duration={item.duration}
             percentage={item.percentage}
             variant={item.variant}
@@ -54,11 +69,11 @@ const Finance: React.FC = () => {
           modules={[Pagination]}
           className="mySwiper"
         >
-          {financialCategories.map((item, index) => (
+          {mergedData.map((item: any, index: any) => (
             <SwiperSlide key={index}>
               <Card
                 title={item.title}
-                price={item.price}
+                price={item.balance}
                 duration={item.duration}
                 percentage={item.percentage}
                 variant={item.variant}

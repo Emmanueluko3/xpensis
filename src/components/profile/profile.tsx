@@ -96,11 +96,6 @@ const arrowIcon = (
   </svg>
 );
 
-const allCountries = [
-  { value: "United States", label: "United States" },
-  { value: "Ghana", label: "Ghana" },
-];
-
 const allNotifications = [
   { type: "Push Notifications", description: "Get notification pop-ups" },
   {
@@ -116,17 +111,19 @@ const allNotifications = [
 
 interface userProfileComponentProps {
   userData: any;
+  financialData: any;
 }
 
 const ProfileComponent: React.FC<userProfileComponentProps> = ({
   userData,
+  financialData,
 }) => {
-  const [fullName, setFullName] = useState(userData.fullName);
-  const [email, setEmail] = useState(userData.email);
-  const [phoneNumber, setPhoneNumber] = useState(userData.phoneNumber);
-  const [country, setCountry] = useState(userData.country);
-  const [state, setState] = useState(userData.state);
-  const [city, setCity] = useState(userData.city);
+  const [fullName, setFullName] = useState(userData?.fullName);
+  const [email, setEmail] = useState(userData?.email);
+  const [phoneNumber, setPhoneNumber] = useState(userData?.phoneNumber);
+  const [country, setCountry] = useState(userData?.country);
+  const [state, setState] = useState(userData?.state);
+  const [city, setCity] = useState(userData?.city);
 
   const [profileTab, setProfileTab] = useState("Account Settings");
   const [settingsScreen, setSettingsScreen] = useState(false);
@@ -136,11 +133,27 @@ const ProfileComponent: React.FC<userProfileComponentProps> = ({
     allNotifications.map(() => false)
   );
 
+  console.log("notifications are", notificationStates);
+
   const handleSwitchChange = (index: number) => {
     const newNotificationStates = [...notificationStates];
     newNotificationStates[index] = !newNotificationStates[index];
     setNotificationStates(newNotificationStates);
   };
+
+  const allCountries = [
+    { value: "United States", label: "United States" },
+    { value: "Ghana", label: "Ghana" },
+  ];
+
+  useEffect(() => {
+    setFullName(userData?.fullName);
+    setEmail(userData?.email);
+    setPhoneNumber(userData?.phoneNumber);
+    setCountry(userData?.country);
+    setState(userData?.state);
+    setCity(userData?.city);
+  }, [userData]);
 
   return (
     <div className="grid grid-flow-row grid-cols-5 gap-3">
@@ -172,9 +185,17 @@ const ProfileComponent: React.FC<userProfileComponentProps> = ({
           <div className="mb-3">
             <Card
               title="Balance"
-              price={200000}
+              price={
+                financialData[0]?.balance! == null && undefined
+                  ? financialData[0]?.balance
+                  : 0
+              }
               duration="Last Month"
-              percentage={5}
+              percentage={
+                financialData[0]?.percentage! == null && undefined
+                  ? financialData[0]?.percentage
+                  : 0
+              }
               variant="#0784C7"
             />
           </div>
@@ -404,3 +425,139 @@ const ProfileComponent: React.FC<userProfileComponentProps> = ({
 };
 
 export default ProfileComponent;
+
+// const transactions = [
+//   { type: "debit", amount: 100, date: "2023-07-10T00:00:00Z" },
+//   { type: "credit", amount: 200, date: "2023-08-15T00:00:00Z" },
+//   { type: "debit", amount: 100, date: "2023-09-10T00:00:00Z" },
+//   { type: "debit", amount: 100, date: "2023-09-10T00:00:00Z" },
+//   { type: "credit", amount: 1231445, date: "2023-09-05T00:00:00Z" },
+// ];
+
+// let Balance = 0;
+
+// transactions.forEach((transaction) => {
+//   if (transaction.type === "debit") {
+//     Balance -= transaction.amount;
+//   } else if (transaction.type === "credit") {
+//     Balance += transaction.amount;
+//   }
+// });
+
+// const currentDate = new Date();
+// const currentMonth = currentDate.getMonth() + 1;
+// const currentYear = currentDate.getFullYear();
+
+// // previous month and year
+// const previousMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+// const previousYear = currentMonth === 1 ? currentYear - 1 : currentYear;
+
+// // Filter transactions for the current month and previous month
+// const currentMonthTransactions = transactions.filter((transaction) => {
+//   const transactionDate = new Date(transaction.date);
+//   const transactionMonth = transactionDate.getMonth() + 1;
+//   const transactionYear = transactionDate.getFullYear();
+
+//   return transactionMonth === currentMonth && transactionYear === currentYear;
+// });
+
+// const previousMonthTransactions = transactions.filter((transaction) => {
+//   const transactionDate = new Date(transaction.date);
+//   const transactionMonth = transactionDate.getMonth() + 1;
+//   const transactionYear = transactionDate.getFullYear();
+
+//   return (
+//     transactionMonth === previousMonth && transactionYear === previousYear
+//   );
+// });
+
+// // Calculate total savings and expenses for each month
+// let currentMonthSavings = 0;
+// let currentMonthExpenses = 0;
+
+// currentMonthTransactions.forEach((transaction) => {
+//   if (transaction.type === "debit") {
+//     currentMonthExpenses += transaction.amount;
+//   } else if (transaction.type === "credit") {
+//     currentMonthSavings += transaction.amount;
+//   }
+// });
+
+// let previousMonthSavings = 0;
+// let previousMonthExpenses = 0;
+
+// previousMonthTransactions.forEach((transaction) => {
+//   if (transaction.type === "debit") {
+//     previousMonthExpenses += transaction.amount;
+//   } else if (transaction.type === "credit") {
+//     previousMonthSavings += transaction.amount;
+//   }
+// });
+
+// // Calculate the percentage change in savings and expenses
+// const savingsPercentageChange = Math.min(
+//   100,
+//   Math.max(
+//     0,
+//     ((currentMonthSavings - previousMonthSavings) / previousMonthSavings) *
+//       100
+//   )
+// );
+// const expensesPercentageChange = Math.min(
+//   100,
+//   Math.max(
+//     0,
+//     ((currentMonthExpenses - previousMonthExpenses) / previousMonthExpenses) *
+//       100
+//   )
+// );
+
+// // balance for each month
+// let currentMonthBalance = 0;
+
+// currentMonthTransactions.forEach((transaction) => {
+//   if (transaction.type === "debit") {
+//     currentMonthBalance -= transaction.amount;
+//   } else if (transaction.type === "credit") {
+//     currentMonthBalance += transaction.amount;
+//   }
+// });
+
+// let previousMonthBalance = 0;
+
+// previousMonthTransactions.forEach((transaction) => {
+//   if (transaction.type === "debit") {
+//     previousMonthBalance -= transaction.amount;
+//   } else if (transaction.type === "credit") {
+//     previousMonthBalance += transaction.amount;
+//   }
+// });
+
+// // Calculate the percentage change in balance, clamped between 0% and 100%
+// const balancePercentageChange = Math.min(
+//   100,
+//   Math.max(
+//     0,
+//     ((currentMonthBalance - previousMonthBalance) /
+//       Math.abs(previousMonthBalance)) *
+//       100
+//   )
+// );
+
+// console.log("Overall Total Balance:", Balance);
+// console.log("Current Month Savings:", currentMonthSavings);
+// console.log("Current Month Expenses:", currentMonthExpenses);
+// console.log(
+//   "Savings Percentage Change:",
+//   savingsPercentageChange.toFixed(2) + "%"
+// );
+// console.log(
+//   "Expenses Percentage Change:",
+//   expensesPercentageChange.toFixed(2)
+// );
+// console.log("Current Month Balance:", currentMonthBalance);
+// console.log("Previous Month Balance:", previousMonthBalance);
+// console.log(
+//   "Balance Percentage Change:",
+//   Math.round(balancePercentageChange)
+// );
