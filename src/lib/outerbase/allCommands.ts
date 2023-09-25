@@ -100,3 +100,26 @@ export async function FinancialData(userId: string) {
     throw error;
   }
 }
+
+export async function AllTransactions(userId: string) {
+  try {
+    const response = await fetch(`${clientDbUrl}/allTransactions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userId: userId, api_key: apiKey }),
+    });
+    if (!response.ok) {
+      throw new Error(
+        `Error fetching user allTransactions: ${response.statusText}`
+      );
+    }
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching user allTransactions:", error);
+    throw error;
+  }
+}

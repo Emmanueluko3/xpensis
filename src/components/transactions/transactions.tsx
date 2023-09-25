@@ -1,6 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "../molecules/Modals/modal";
+import { useSession } from "next-auth/react";
+import { AllTransactions } from "@/lib/outerbase/allCommands";
 
 const spendingIcon = (
   <svg
@@ -39,49 +41,75 @@ const fundingIcon = (
 );
 
 const Transactions: React.FC = () => {
+  const { data: session }: any = useSession();
+  const userId = session?.user?.items[0]?.userId;
+  const [allTransactions, setAllTransactions] = useState([]);
   const [viewAllTransactions, setViewAllTransactions] = useState(false);
+  console.log("Financial Data", allTransactions);
+  useEffect(() => {
+    async function fetchTransactions() {
+      try {
+        const data = await AllTransactions(userId?.toString());
+        setAllTransactions(data);
+      } catch (error) {
+        console.error("Error in fetchTransactions:", error);
+      }
+    }
+    fetchTransactions();
+  }, [userId]);
+
+  function formatDate(inputDate: string) {
+    const date = new Date(inputDate);
+    const formattedDate = date.toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+    return formattedDate;
+  }
+
   const recentTransactions = [
     {
       title: "Rent",
       amount: 120000,
-      date: "15th May, 2023",
-      status: "outgoing",
+      date: "2023-09-23T00:00:00Z",
+      type: "debit",
     },
     {
       title: "Rent",
       amount: 120000,
-      date: "15th May, 2023",
-      status: "outgoing",
+      date: "2023-09-23T00:00:00Z",
+      type: "credits",
     },
     {
       title: "Wallet Funding",
       amount: 2220000,
-      date: "15th May, 2023",
-      status: "incoming",
+      date: "2023-09-23T00:00:00Z",
+      type: "incoming",
     },
     {
       title: "Rent",
       amount: 120000,
-      date: "15th May, 2023",
-      status: "outgoing",
+      date: "2023-09-23T00:00:00Z",
+      type: "outgoing",
     },
     {
       title: "Rent",
       amount: 120000,
-      date: "15th May, 2023",
-      status: "outgoing",
+      date: "2023-09-23T00:00:00Z",
+      type: "outgoing",
     },
     {
       title: "Wallet Funding",
       amount: 2220000,
-      date: "15th May, 2023",
-      status: "incoming",
+      date: "2023-09-23T00:00:00Z",
+      type: "incoming",
     },
     {
       title: "Rent",
       amount: 120000,
-      date: "15th May, 2023",
-      status: "outgoing",
+      date: "2023-09-23T00:00:00Z",
+      type: "outgoing",
     },
   ];
 
@@ -111,28 +139,28 @@ const Transactions: React.FC = () => {
         </button>
       </div>
       <div className="w-full">
-        {recentTransactions.map((item, index) => (
+        {allTransactions.map((item: any, index) => (
           <div
             key={index}
             className="py-4 border-b border-[#D2D2D2] w-full flex justify-between mb-2"
           >
             <div
               className={`flex justify-center text-2xl items-center w-9 h-9 rounded-full bg-opacity-5 mr-3 ${
-                item.status === "incoming" ? "bg-customGreen" : "bg-customRed"
+                item.type === "credit" ? "bg-customGreen" : "bg-customRed"
               }`}
             >
-              {item.status === "incoming" ? fundingIcon : spendingIcon}
+              {item.type === "credit" ? fundingIcon : spendingIcon}
             </div>
             <div className="mr-auto">
               {" "}
               <h3 className="text-gray-950 font-medium text-sm mb-2">
-                {item.title}
+                {item.type === "credit" ? "Wallet Funding" : item.title}
               </h3>
               <p className=" text-customGray1 text-xs font-medium">
-                {item.date}
+                {formatDate(item.date)}
               </p>
             </div>
-            <h3 className="text-base font-medium">&#8358; {item.amount}</h3>
+            <h3 className="text-base font-medium">&#8358; {item.amount}.0</h3>
           </div>
         ))}
       </div>
@@ -162,28 +190,27 @@ const Transactions: React.FC = () => {
         </button>
       </div>
       <div className="w-full">
-        {recentTransactions.map((item, index) => (
+        {allTransactions?.map((item: any, index) => (
           <div
             key={index}
             className="py-4 border-b border-[#D2D2D2] w-full flex justify-between mb-2"
           >
             <div
               className={`flex justify-center text-2xl items-center w-9 h-9 rounded-full bg-opacity-5 mr-3 ${
-                item.status === "incoming" ? "bg-customGreen" : "bg-customRed"
+                item.type === "credit" ? "bg-customGreen" : "bg-customRed"
               }`}
             >
-              {item.status === "incoming" ? fundingIcon : spendingIcon}
+              {item.type === "credit" ? fundingIcon : spendingIcon}
             </div>
             <div className="mr-auto">
-              {" "}
               <h3 className="text-gray-950 font-medium text-sm mb-2">
-                {item.title}
+                {item.type === "credit" ? "Wallet Funding" : item.title}
               </h3>
               <p className=" text-customGray1 text-xs font-medium">
-                {item.date}
+                {formatDate(item.date)}
               </p>
             </div>
-            <h3 className="text-base font-medium">&#8358; {item.amount}</h3>
+            <h3 className="text-base font-medium">&#8358; {item.amount}.0</h3>
           </div>
         ))}
       </div>

@@ -54,7 +54,9 @@ const Finance: React.FC = () => {
             title={item.title}
             price={item.balance}
             duration={item.duration}
-            percentage={item.percentage}
+            percentage={
+              item?.percentage !== null && undefined ? item?.percentage : 0
+            }
             variant={item.variant}
           />
         ))}
@@ -69,15 +71,18 @@ const Finance: React.FC = () => {
           modules={[Pagination]}
           className="mySwiper"
         >
-          {mergedData.map((item: any, index: any) => (
+          {mergedData?.map((item: any, index: any) => (
             <SwiperSlide key={index}>
               <Card
                 title={item.title}
                 price={item.balance}
                 duration={item.duration}
-                percentage={item.percentage}
+                percentage={
+                  item?.percentage !== null && undefined ? item?.percentage : 0
+                }
                 variant={item.variant}
               />
+              <div className="mt-[15%]"></div>
             </SwiperSlide>
           ))}
         </Swiper>
