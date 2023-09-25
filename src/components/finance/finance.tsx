@@ -77,7 +77,7 @@ const Finance: React.FC = () => {
                 price={item.balance}
                 duration={item.duration}
                 percentage={
-                  item?.percentage !== null && undefined ? item?.percentage : 0
+                  item?.percentage !== null || undefined ? item?.percentage : 0
                 }
                 variant={item.variant}
               />
