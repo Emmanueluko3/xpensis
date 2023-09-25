@@ -155,6 +155,8 @@ const ProfileComponent: React.FC<userProfileComponentProps> = ({
     setCity(userData?.city);
   }, [userData]);
 
+  console.log("finance: ", financialData);
+
   return (
     <div className="grid grid-flow-row grid-cols-5 gap-3">
       <div
@@ -186,13 +188,13 @@ const ProfileComponent: React.FC<userProfileComponentProps> = ({
             <Card
               title="Balance"
               price={
-                financialData[0]?.balance! == null && undefined
+                financialData[0]?.balance !== null || undefined
                   ? financialData[0]?.balance
                   : 0
               }
               duration="Last Month"
               percentage={
-                financialData[0]?.percentage! == null && undefined
+                financialData[0]?.percentage !== null || undefined
                   ? financialData[0]?.percentage
                   : 0
               }

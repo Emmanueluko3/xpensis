@@ -13,7 +13,6 @@ const Finance: React.FC = () => {
 
   const userId = session?.user?.items[0]?.userId;
   const [financialData, setFinancialData] = useState([]);
-  console.log("Financial Data", financialData);
   useEffect(() => {
     async function fetchFinancialData() {
       try {
@@ -55,7 +54,7 @@ const Finance: React.FC = () => {
             price={item.balance}
             duration={item.duration}
             percentage={
-              item?.percentage !== null && undefined ? item?.percentage : 0
+              item?.percentage !== null || undefined ? item?.percentage : 0
             }
             variant={item.variant}
           />

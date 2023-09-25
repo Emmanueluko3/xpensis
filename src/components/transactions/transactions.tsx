@@ -68,51 +68,6 @@ const Transactions: React.FC = () => {
     return formattedDate;
   }
 
-  const recentTransactions = [
-    {
-      title: "Rent",
-      amount: 120000,
-      date: "2023-09-23T00:00:00Z",
-      type: "debit",
-    },
-    {
-      title: "Rent",
-      amount: 120000,
-      date: "2023-09-23T00:00:00Z",
-      type: "credits",
-    },
-    {
-      title: "Wallet Funding",
-      amount: 2220000,
-      date: "2023-09-23T00:00:00Z",
-      type: "incoming",
-    },
-    {
-      title: "Rent",
-      amount: 120000,
-      date: "2023-09-23T00:00:00Z",
-      type: "outgoing",
-    },
-    {
-      title: "Rent",
-      amount: 120000,
-      date: "2023-09-23T00:00:00Z",
-      type: "outgoing",
-    },
-    {
-      title: "Wallet Funding",
-      amount: 2220000,
-      date: "2023-09-23T00:00:00Z",
-      type: "incoming",
-    },
-    {
-      title: "Rent",
-      amount: 120000,
-      date: "2023-09-23T00:00:00Z",
-      type: "outgoing",
-    },
-  ];
-
   const showAllTransactions = (
     <div className="p-5 rounded-lg bg-[#fff] lg:w-[40vw] overflow-x-auto max-h-[90vh] no-scrollbar">
       <div className="flex justify-between pb-3 mb-5 border-b">
@@ -219,3 +174,48 @@ const Transactions: React.FC = () => {
 };
 
 export default Transactions;
+
+// const recentTransactions = [
+//   {
+//     title: "Rent",
+//     amount: 120000,
+//     date: "2023-09-23T00:00:00Z",
+//     type: "debit",
+//   },
+//   {
+//     title: "Rent",
+//     amount: 120000,
+//     date: "2023-09-23T00:00:00Z",
+//     type: "credits",
+//   },
+//   {
+//     title: "Wallet Funding",
+//     amount: 2220000,
+//     date: "2023-09-23T00:00:00Z",
+//     type: "incoming",
+//   },
+//   {
+//     title: "Rent",
+//     amount: 120000,
+//     date: "2023-09-23T00:00:00Z",
+//     type: "outgoing",
+//   },
+//   {
+//     title: "Rent",
+//     amount: 120000,
+//     date: "2023-09-23T00:00:00Z",
+//     type: "outgoing",
+//   },
+//   {
+//     title: "Wallet Funding",
+//     amount: 2220000,
+//     date: "2023-09-23T00:00:00Z",
+//     type: "incoming",
+//   },
+//   {
+//     title: "Rent",
+//     amount: 120000,
+//     date: "2023-09-23T00:00:00Z",
+//     type: "outgoing",
+//   },
+// ];

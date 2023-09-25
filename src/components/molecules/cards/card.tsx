@@ -52,7 +52,7 @@ const Card: React.FC<CardProps> = ({
       className={`w-full bg-center bg-no-repeat bg-cardOverlay rounded-lg p-5`}
     >
       <h4 className="text-base text-white font-medium">{title}</h4>
-      <h3 className="my-5 text-white text-3xl font-bold">&#8358; {price}</h3>
+      <h3 className="my-5 text-white text-3xl font-bold">&#8358; {price}.00</h3>
       <h4 className="flex text-white font-medium text-base">
         From {duration}{" "}
         <span className="font-semibold flex">
