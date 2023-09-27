@@ -123,3 +123,24 @@ export async function AllTransactions(userId: string) {
     throw error;
   }
 }
+
+export async function allBills(userId: string) {
+  try {
+    const response = await fetch(`${clientDbUrl}/bills`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userId: userId, api_key: apiKey }),
+    });
+    if (!response.ok) {
+      throw new Error(`Error fetching user Bills: ${response.statusText}`);
+    }
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching user Bills:", error);
+    throw error;
+  }
+}

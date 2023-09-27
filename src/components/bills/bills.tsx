@@ -137,14 +137,17 @@ const allBanks = [
   { label: "Zenith Bank", value: "Zenith Bank" },
 ];
 
-const Bill: React.FC = () => {
+interface billProps {
+  userBills: any[];
+}
+const Bill: React.FC<billProps> = ({ userBills }) => {
   const [tab, setTab] = useState(0);
   const [addCategory, setAddCategory] = useState(false);
   const [payBill, setPayBill] = useState(false);
   const [seeAlert, setSeeAlert] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
   const tabs = ["Recurring Bills", "Non-recurring Bills"];
-
+  console.log("user bills: ", userBills);
   const [currentYear, setCurrentYear] = useState<number>(
     currentDate.getFullYear()
   );
@@ -210,6 +213,10 @@ const Bill: React.FC = () => {
     return calendarGrid;
   };
 
+  const handlePayBill = (index: number) => {
+    // paybill modal
+  };
+
   const recurringBills = (
     <>
       {recentTransactions.map((item, index) => (
@@ -256,10 +263,11 @@ const Bill: React.FC = () => {
 
   const nonRecurringBills = (
     <>
-      {recentTransactions.map((item, index) => (
+      {userBills?.map((item, index) => (
         <div
+          onClick={() => handlePayBill(index)}
           key={index}
-          className="py-4 border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"
+          className="py-4 cursor-pointer border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"
         >
           <div className="lg:w-[45%] w-[70%] flex justify-center items-center">
             <div
@@ -279,13 +287,19 @@ const Bill: React.FC = () => {
           <div className="lg:w-[55%] w-[25%] flex flex-col lg:flex-row justify-between items-end lg:items-center">
             <div className="mr-auto w-full lg:w-1/2">
               <p className=" text-customGray1 text-xs font-normal mb-2">
-                70/100%
+                {Math.round((item.currentAmount / item.limitAmount) * 100)}/100%
               </p>
-              <ProgressBar progress={20} addClassName="h-[6px]" />
+              <ProgressBar
+                progress={(item.currentAmount / item.limitAmount) * 100}
+                addClassName="h-[6px]"
+              />
             </div>
 
             <h3 className="text-base font-bold hidden lg:block">
-              &#8358; {item.amount}
+              &#8358; {item.currentAmount.toLocaleString()}
+              <span className=" text-sm font-normal">
+                / &#8358;{item.limitAmount.toLocaleString()}
+              </span>
             </h3>
           </div>
         </div>
