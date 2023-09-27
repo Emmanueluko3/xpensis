@@ -9,6 +9,8 @@ import Button from "../atoms/button";
 import InputGroup from "../molecules/inputGroup/inputGroup";
 import SelectGroup from "../molecules/inputGroup/selectGroup";
 import Card from "../molecules/cards/card";
+import { PostData } from "@/lib/outerbase/allCommands";
+import ModalComponent from "../molecules/Modals/modalComponent";
 
 const energyIcon = (
   <svg
@@ -127,8 +129,10 @@ const days: string[] = ["Sun", "Mon", "Tue", "Tue", "Thu", "Fri", "Sat"];
 
 const allCategories = [
   { label: "Electricity", value: "Electricity" },
-  { label: "Electricity", value: "Electricity" },
-  { label: "Electricity", value: "Electricity" },
+  { label: "Internet", value: "Internet" },
+  { label: "Cooking Gas", value: "Cooking Gas" },
+  { label: "Health Insurance", value: "Health Insurance" },
+  { label: "Others", value: "Others" },
 ];
 
 const allBanks = [
@@ -143,10 +147,52 @@ interface billProps {
 const Bill: React.FC<billProps> = ({ userBills }) => {
   const [tab, setTab] = useState(0);
   const [addCategory, setAddCategory] = useState(false);
+  const [notifyModal, setNotifyModal] = useState(false);
+  const [newBill, setNewBill] = useState(false);
   const [payBill, setPayBill] = useState(false);
+  const tabs = ["Recurring Bills", "Non-recurring Bills"];
+
+  // bill input fields
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState("");
   const [seeAlert, setSeeAlert] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
-  const tabs = ["Recurring Bills", "Non-recurring Bills"];
+  const [recurrenceFrequency, setRecurrenceFrequency] = useState<string>("");
+  const [askForPayment, setAskForPayment] = useState("");
+  const [nextDueDate, setNextDueDate] = useState<Date | null>(null);
+  const [categoryTitle, setCategoryTitle] = useState("");
+
+  const billData = {
+    title: categoryTitle === "Others" ? title : categoryTitle,
+    limitAmount: amount,
+    setAlert: seeAlert === true ? 1 : 0,
+    isRecurring: isRecurring === true ? 1 : 0,
+    recurrenceFrequency: isRecurring === true ? recurrenceFrequency : null,
+    askForPayment: isRecurring === true ? (askForPayment === "Yes" ? 1 : 0) : 0,
+    nextDueDate: isRecurring === true ? nextDueDate?.toISOString() : null,
+  };
+
+  const createBill = async () => {
+    try {
+      const post = await PostData(billData, "/createBills");
+      console.log("posssss", post.response);
+      if (post.response.ok) {
+        setTitle("");
+        setAmount("");
+        setSeeAlert(false);
+        setIsRecurring(false);
+        setRecurrenceFrequency("");
+        setAskForPayment("");
+        setNextDueDate(null);
+        setCategoryTitle("");
+      }
+      setAddCategory(false);
+      setNotifyModal(true);
+    } catch (error) {
+      console.error("Error creating", error);
+    }
+  };
+
   console.log("user bills: ", userBills);
   const [currentYear, setCurrentYear] = useState<number>(
     currentDate.getFullYear()
@@ -157,6 +203,7 @@ const Bill: React.FC<billProps> = ({ userBills }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const handleDateClick = (date: Date) => {
     setSelectedDate(date);
+    setNextDueDate(date);
   };
 
   const handleMonthChange = (increment: number) => {
@@ -213,105 +260,197 @@ const Bill: React.FC<billProps> = ({ userBills }) => {
     return calendarGrid;
   };
 
-  const handlePayBill = (index: number) => {
-    // paybill modal
+  // const handlePayBill = (item: any) => {
+  //   <div className="p-5 rounded-lg bg-[#fff] lg:w-[40vw] overflow-x-auto max-h-[90vh] no-scrollbar">
+  //     <div className="flex justify-between pb-3 mb-5 border-b">
+  //       <h2 className="text-2xl text-gray-950 font-bold">New Bill</h2>
+  //       <button
+  //         className=" text-customGray hover:text-customBlue"
+  //         onClick={() => setNewBill(false)}
+  //       >
+  //         <svg
+  //           xmlns="http://www.w3.org/2000/svg"
+  //           width="24"
+  //           height="24"
+  //           viewBox="0 0 24 24"
+  //           fill="currentColor"
+  //         >
+  //           <path
+  //             d="M12 11.0102L11.6465 10.6567L6.49494 5.50511C6.49492 5.50509 6.4949 5.50507 6.49488 5.50506C6.36362 5.37386 6.18563 5.30016 6.00004 5.30016C5.81447 5.30016 5.6365 5.37384 5.50524 5.505C5.50521 5.50504 5.50517 5.50507 5.50514 5.50511M12 11.0102L5.50514 5.50511M12 11.0102L12.3536 10.6567L17.5052 5.50506L17.5052 5.50511L17.5113 5.49886C17.5759 5.432 17.6531 5.37867 17.7385 5.34199C17.8239 5.3053 17.9158 5.28599 18.0087 5.28518C18.1016 5.28438 18.1938 5.30209 18.2798 5.33728C18.3659 5.37248 18.444 5.42446 18.5098 5.49018C18.5755 5.55591 18.6275 5.63406 18.6627 5.72009C18.6979 5.80612 18.7156 5.8983 18.7148 5.99124C18.7139 6.08418 18.6946 6.17604 18.658 6.26144C18.6213 6.34684 18.5679 6.42408 18.5011 6.48866L18.501 6.4886L18.4949 6.49475L13.3433 11.6463L12.9897 11.9999L13.3433 12.3535L18.4914 17.5016C18.6173 17.6333 18.6868 17.809 18.6853 17.9912C18.6837 18.1748 18.6101 18.3503 18.4803 18.4801C18.3505 18.6099 18.1749 18.6835 17.9914 18.6851C17.8091 18.6867 17.6335 18.6171 17.5017 18.4913L12.3536 13.3431L12 12.9896L11.6465 13.3431L6.49836 18.4913C6.36663 18.6171 6.19098 18.6867 6.0087 18.6851C5.82516 18.6835 5.64959 18.6099 5.51981 18.4801C5.39002 18.3503 5.3164 18.1748 5.31481 17.9912C5.31322 17.809 5.38281 17.6333 5.50867 17.5016L10.6568 12.3535L11.0103 11.9999L10.6568 11.6463L5.50524 6.4948M12 11.0102L5.50524 6.4948M5.50514 5.50511C5.37397 5.63637 5.30029 5.81434 5.30029 5.9999C5.30029 6.18549 5.37399 6.36348 5.50519 6.49475M5.50514 5.50511L5.50519 6.49475M5.50519 6.49475C5.50521 6.49477 5.50523 6.49478 5.50524 6.4948M5.50519 6.49475L5.50524 6.4948"
+  //             fill="currentColor"
+  //             stroke="currentColor"
+  //           />
+  //         </svg>
+  //       </button>
+  //     </div>
+  //     <div>
+  //       <div className="mb-3">
+  //         <div
+  //           className={`w-full bg-center border-2 border-customBlue bg-no-repeat bg-cardOverlay rounded-lg p-5`}
+  //         >
+  //           <h4 className="text-base text-white font-medium">{item.title}</h4>
+  //           <h3 className="my-5 text-white text-3xl font-bold">
+  //             &#8358; {item.currentAmount}.00/{item.limitAmount}
+  //           </h3>
+  //           <div className="mr-auto w-full lg:w-1/2">
+  //             <p className=" text-customGray1 text-xs font-normal mb-2">
+  //               {Math.round((item.currentAmount / item.limitAmount) * 100)}
+  //               /100%
+  //             </p>
+  //             <ProgressBar
+  //               progress={(item.currentAmount / item.limitAmount) * 100}
+  //               addClassName="h-[6px]"
+  //             />
+  //           </div>
+  //         </div>
+  //       </div>
+  //       <div className="mb-3">
+  //         <SelectGroup
+  //           label="Reciepient Bank"
+  //           placeholder="Select"
+  //           options={allBanks.map((item) => item)}
+  //         />
+  //       </div>
+  //       <div className="mb-3">
+  //         <InputGroup
+  //           label="Recipient Account Number"
+  //           placeholder="1234567890"
+  //         />
+  //       </div>
+  //       <div className="mb-3">
+  //         <InputGroup label="Amount" placeholder="1,000" />
+  //       </div>
+  //       <div className="mb-3">
+  //         <InputGroup label="Description" />
+  //       </div>
+
+  //       <div className="w-full">
+  //         <Button onClick={() => setAddCategory(false)}>Proceed</Button>
+  //       </div>
+  //     </div>
+  //   </div>;
+  // };
+
+  const formatDate = (inputDate: string) => {
+    const date = new Date(inputDate);
+    const formattedDate = date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "2-digit",
+    });
+    return formattedDate;
   };
 
   const recurringBills = (
     <>
-      {recentTransactions.map((item, index) => (
-        <div
-          key={index}
-          className="py-4 border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"
-        >
-          <div className="w-full flex justify-center items-center">
-            <div
-              className={`flex justify-center text-2xl items-center w-9 h-9 rounded-full bg-opacity-5 mr-3 bg-customBlue`}
-            >
-              {energyIcon}
-            </div>
-            <div className="mr-auto">
-              <h3 className="text-gray-950 font-normal text-sm mb-1">
-                {item.title}
-              </h3>
-              <p className=" text-customGray1 text-xs font-normal">
-                {item.date}
-              </p>
-            </div>
-          </div>
-          <div className="w-full flex flex-col lg:flex-row justify-between items-end lg:items-center">
-            <div className="lg:w-1/2 flex lg:items-center justify-center">
-              <span
-                className={`${
-                  item.status === "Paid"
-                    ? "bg-customDarkGreen"
-                    : "bg-customDarkRed"
-                } bg-opacity-10 px-3 lg:py-1 mb-1 lg:mb-0 rounded-full text-xs`}
+      {userBills
+        .filter((item) => item.isRecurring === 1)
+        ?.map((item, index) => (
+          <div
+            key={index}
+            className="py-4 border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"
+          >
+            <div className="w-full flex justify-center items-center">
+              <div
+                className={`flex justify-center text-2xl items-center w-9 h-9 rounded-full bg-opacity-5 mr-3 bg-customBlue`}
               >
-                {item.status}
-              </span>
+                {energyIcon}
+              </div>
+              <div className="mr-auto">
+                <h3 className="text-gray-950 font-normal text-sm mb-1">
+                  {item.title}
+                </h3>
+                <p className=" text-customGray1 text-xs font-normal">
+                  {formatDate(item.nextDueDate)}
+                </p>
+              </div>
             </div>
+            <div className="w-full flex flex-col lg:flex-row justify-between items-end lg:items-center">
+              <div className="lg:w-1/2 flex lg:items-center justify-center">
+                <span
+                  className={`${
+                    item.status === "Paid"
+                      ? "bg-customDarkGreen"
+                      : "bg-customDarkRed"
+                  } bg-opacity-10 px-3 lg:py-1 mb-1 lg:mb-0 rounded-full text-xs`}
+                >
+                  {item.currentAmount === item.limitAmount ? "Paid" : "Pending"}
+                </span>
+              </div>
 
-            <h3 className="lg:text-base text-sm font-semibold lg:font-bold">
-              &#8358; {item.amount}
-            </h3>
+              <h3 className="lg:text-base text-sm font-semibold lg:font-bold">
+                &#8358; {item.limitAmount.toLocaleString()}
+              </h3>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
     </>
   );
 
   const nonRecurringBills = (
     <>
-      {userBills?.map((item, index) => (
-        <div
-          onClick={() => handlePayBill(index)}
-          key={index}
-          className="py-4 cursor-pointer border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"
-        >
-          <div className="lg:w-[45%] w-[70%] flex justify-center items-center">
-            <div
-              className={`flex justify-center text-2xl items-center w-9 h-9 rounded-full bg-opacity-5 mr-3 bg-customBlue`}
-            >
-              {energyIcon}
+      {userBills
+        .filter((item) => item.isRecurring === 0)
+        ?.map((item, index) => (
+          <div
+            // onClick={() => handlePayBill(item, index)}
+            key={index}
+            className="py-4 cursor-pointer border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"
+          >
+            <div className="lg:w-[45%] w-[70%] flex justify-center items-center">
+              <div
+                className={`flex justify-center text-2xl items-center w-9 h-9 rounded-full bg-opacity-5 mr-3 bg-customBlue`}
+              >
+                {energyIcon}
+              </div>
+              <div className="mr-auto">
+                <h3 className="text-gray-950 font-normal text-sm">
+                  {item.title}
+                </h3>
+                <h3 className="text-sm font-semibold lg:hidden">
+                  &#8358; {item.currentAmount.toLocaleString()}
+                  <span className=" text-xs font-normal">
+                    / &#8358;{item.limitAmount.toLocaleString()}
+                  </span>
+                </h3>
+              </div>
             </div>
-            <div className="mr-auto">
-              <h3 className="text-gray-950 font-normal text-sm">
-                {item.title}
-              </h3>
-              <h3 className="text-sm font-semibold lg:hidden">
+            <div className="lg:w-[55%] w-[25%] flex flex-col lg:flex-row justify-between items-end lg:items-center">
+              <div className="mr-auto w-full lg:w-1/2">
+                <p className=" text-customGray1 text-xs font-normal mb-2">
+                  {Math.round((item.currentAmount / item.limitAmount) * 100)}
+                  /100%
+                </p>
+                <ProgressBar
+                  progress={(item.currentAmount / item.limitAmount) * 100}
+                  addClassName="h-[6px]"
+                />
+              </div>
+
+              <h3 className="text-base font-bold hidden lg:block">
                 &#8358; {item.currentAmount.toLocaleString()}
-                <span className=" text-xs font-normal">
+                <span className=" text-sm font-normal">
                   / &#8358;{item.limitAmount.toLocaleString()}
                 </span>
               </h3>
             </div>
           </div>
-          <div className="lg:w-[55%] w-[25%] flex flex-col lg:flex-row justify-between items-end lg:items-center">
-            <div className="mr-auto w-full lg:w-1/2">
-              <p className=" text-customGray1 text-xs font-normal mb-2">
-                {Math.round((item.currentAmount / item.limitAmount) * 100)}/100%
-              </p>
-              <ProgressBar
-                progress={(item.currentAmount / item.limitAmount) * 100}
-                addClassName="h-[6px]"
-              />
-            </div>
-
-            <h3 className="text-base font-bold hidden lg:block">
-              &#8358; {item.currentAmount.toLocaleString()}
-              <span className=" text-sm font-normal">
-                / &#8358;{item.limitAmount.toLocaleString()}
-              </span>
-            </h3>
-          </div>
-        </div>
-      ))}
+        ))}
     </>
   );
 
+  const handleAmountChange = (e: any) => {
+    let inputValue = e.target.value;
+    inputValue = inputValue.replace(/[^0-9.]/g, "");
+    const decimalCount = (inputValue.match(/\./g) || []).length;
+    if (decimalCount > 1) {
+      inputValue = inputValue.slice(0, inputValue.lastIndexOf("."));
+    }
+    setAmount(inputValue);
+  };
+
   const addCategoryForm = (
-    <div className="p-5 rounded-lg bg-[#fff] lg:w-[40vw] overflow-x-auto lg:max-h-[90vh] max-h-[90vh] no-scrollbar">
+    <div className="p-3 lg:p-5 rounded-lg bg-[#fff] lg:w-[40vw] overflow-x-auto lg:max-h-[90vh] max-h-[90vh] no-scrollbar">
       <div className="flex justify-between pb-3 mb-5 border-b">
         <h2 className="text-2xl text-gray-950 font-bold">New Category</h2>
         <button
@@ -335,17 +474,32 @@ const Bill: React.FC<billProps> = ({ userBills }) => {
       </div>
       <div>
         <div className="mb-3">
-          <InputGroup placeholder="e.g Electricity" label="Title" />
-        </div>
-        <div className="mb-3">
           <SelectGroup
+            onChange={(e) => setCategoryTitle(e.target.value)}
+            value={categoryTitle}
             placeholder="Select"
             label="Category"
             options={allCategories.map((item) => item)}
           />
         </div>
+        {categoryTitle === "Others" && (
+          <div className="mb-3">
+            <InputGroup
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g Electricity"
+              label="Title"
+            />
+          </div>
+        )}
         <div className="mb-3">
-          <InputGroup placeholder="1,000" label="Amount" />
+          <InputGroup
+            type="text"
+            value={`₦ ${amount}`}
+            onChange={(e) => handleAmountChange(e)}
+            placeholder="1,000"
+            label="Amount"
+          />
         </div>
 
         <div className="rounded-lg p-3 mb-3 flex justify-between items-center">
@@ -397,42 +551,45 @@ const Bill: React.FC<billProps> = ({ userBills }) => {
                 </div>
               )} */}
             </div>
-            <div className="grid grid-flow-row grid-cols-2 gap-2">
-              <div className="rounded-lg border p-3 mb-3 w-full">
-                <select
-                  name=""
-                  id=""
-                  className="w-full placeholder:bg-[#fff] bg-[#fff] focus:outline-none"
-                >
-                  <option value="Category">Frequency</option>
-                </select>
-              </div>
-              <div className="rounded-lg border p-3 mb-3 w-full">
-                <select
-                  name=""
-                  id=""
-                  className="w-full placeholder:bg-[#fff] bg-[#fff] focus:outline-none"
-                >
-                  <option value="Category">Ask before payment</option>
-                </select>
-              </div>
+            <div className="grid grid-flow-row grid-cols-2 gap-2 mb-3">
+              <SelectGroup
+                onChange={(e) => setRecurrenceFrequency(e.target.value)}
+                value={recurrenceFrequency}
+                placeholder="Frequency"
+                label=""
+                options={[
+                  { label: "Monthly", value: "Monthly" },
+                  { label: "Yearly", value: "Yearly" },
+                ]}
+              />
+
+              <SelectGroup
+                onChange={(e) => setAskForPayment(e.target.value)}
+                value={askForPayment}
+                placeholder="Ask before payment"
+                label=""
+                options={[
+                  { label: "Yes", value: "Yes" },
+                  { label: "No", value: "No" },
+                ]}
+              />
             </div>
           </>
         )}
         <div className="w-full">
-          <Button onClick={() => setAddCategory(false)}>Create</Button>
+          <Button onClick={() => createBill()}>Create</Button>
         </div>
       </div>
     </div>
   );
 
-  const payBillForm = (
-    <div className="p-5 rounded-lg bg-[#fff] lg:w-[40vw] overflow-x-auto max-h-[90vh] no-scrollbar">
+  const newBillForm = (
+    <div className="p-3 lg:p-5 rounded-lg bg-[#fff] lg:w-[40vw] overflow-x-auto max-h-[90vh] no-scrollbar">
       <div className="flex justify-between pb-3 mb-5 border-b">
         <h2 className="text-2xl text-gray-950 font-bold">New Bill</h2>
         <button
           className=" text-customGray hover:text-customBlue"
-          onClick={() => setPayBill(false)}
+          onClick={() => setNewBill(false)}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -543,7 +700,7 @@ const Bill: React.FC<billProps> = ({ userBills }) => {
           ))}
         </div>
         <button
-          onClick={() => setPayBill(true)}
+          onClick={() => setNewBill(true)}
           className="hidden lg:block bg-customBlue text-white text-base font-medium py-2 px-4 rounded-lg hover:bg-opacity-80"
         >
           New Bill
@@ -556,6 +713,14 @@ const Bill: React.FC<billProps> = ({ userBills }) => {
         {tab === 0 && recurringBills}
         {tab === 1 && nonRecurringBills}
       </div>
+      {notifyModal && (
+        <ModalComponent
+          lottie={LottieSuccess}
+          title="Successful!"
+          subtitle="A new category have been added"
+          onClose={() => setNotifyModal(false)}
+        />
+      )}
       {addCategory && (
         <Modal
           onClose={() => {
@@ -565,13 +730,22 @@ const Bill: React.FC<billProps> = ({ userBills }) => {
           {addCategoryForm}
         </Modal>
       )}
+      {newBill && (
+        <Modal
+          onClose={() => {
+            setNewBill(false);
+          }}
+        >
+          {newBillForm}
+        </Modal>
+      )}
       {payBill && (
         <Modal
           onClose={() => {
             setPayBill(false);
           }}
         >
-          {payBillForm}
+          {/* {handlePayBill} */}
         </Modal>
       )}
       <button
@@ -582,7 +756,7 @@ const Bill: React.FC<billProps> = ({ userBills }) => {
       </button>
 
       <div className="lg:hidden w-full">
-        <Button onClick={() => setPayBill(true)}>New Bill</Button>
+        <Button onClick={() => setNewBill(true)}>New Bill</Button>
       </div>
     </div>
   );

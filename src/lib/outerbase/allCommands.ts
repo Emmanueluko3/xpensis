@@ -144,3 +144,26 @@ export async function allBills(userId: string) {
     throw error;
   }
 }
+
+export async function PostData(PostData: any, endpoint: string) {
+  PostData.api_key = apiKey;
+  PostData.userId = "15";
+  try {
+    const response = await fetch(clientDbUrl + endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(PostData),
+    });
+    if (!response.ok) {
+      throw new Error(`Error fetching user Bills: ${response.statusText}`);
+    }
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching user Bills:", error);
+    throw error;
+  }
+}
