@@ -280,7 +280,10 @@ const Bill: React.FC<billProps> = ({ userBills }) => {
                 {item.title}
               </h3>
               <h3 className="text-sm font-semibold lg:hidden">
-                &#8358; {item.amount}
+                &#8358; {item.currentAmount.toLocaleString()}
+                <span className=" text-xs font-normal">
+                  / &#8358;{item.limitAmount.toLocaleString()}
+                </span>
               </h3>
             </div>
           </div>
