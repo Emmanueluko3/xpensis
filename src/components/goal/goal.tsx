@@ -1,13 +1,17 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProgressBar from "../atoms/progressbar";
 import Modal from "../molecules/Modals/modal";
 import Switch from "../atoms/switch";
 import LottieSuccess from "../../../public/assets/lotties/lottieSuccess.json";
 import Lottie from "../atoms/lottie";
 import Image from "next/image";
-import Iphone12 from "@/../public/assets/images/Iphone12.webp";
+import GoalImg from "@/../public/assets/images/goal.jpg";
 import InputGroup from "../molecules/inputGroup/inputGroup";
+import SelectGroup from "../molecules/inputGroup/selectGroup";
+import { PostData } from "@/lib/outerbase/allCommands";
+import ModalComponent from "../molecules/Modals/modalComponent";
+import Button from "../atoms/button";
 
 const arrowIcon = (
   <svg
@@ -94,12 +98,8 @@ const months: string[] = [
 const days: string[] = ["Sun", "Mon", "Tue", "Tue", "Thu", "Fri", "Sat"];
 
 const Goal: React.FC = () => {
-  const [tab, setTab] = useState(0);
   const [addGoal, setAddGoal] = useState(false);
-  const [seeAlert, setSeeAlert] = useState(false);
-  const [newGoal, setNewGoal] = useState(false);
-  const tabs = ["Recurring Bills", "Non-recurring Bills"];
-
+  const [goalList, setGoalList] = useState<any>([]);
   const [currentYear, setCurrentYear] = useState<number>(
     currentDate.getFullYear()
   );
@@ -109,8 +109,54 @@ const Goal: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const handleDateClick = (date: Date) => {
     setSelectedDate(date);
+    setNextDueDate(date);
   };
 
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurrenceFrequency, setRecurrenceFrequency] = useState("");
+  const [nextDueDate, setNextDueDate] = useState<Date | null>(null);
+  const [notifyModal, setNotifyModal] = useState(false);
+  const goalData = {
+    title: title,
+    goalAmount: amount,
+    imageUrl: imageUrl,
+    isRecurring: isRecurring === true ? 1 : 0,
+    recurrenceFrequency: recurrenceFrequency,
+    nextDueDate: isRecurring === true ? nextDueDate?.toISOString() : null,
+  };
+
+  const createGoal = async () => {
+    try {
+      const post = await PostData(goalData, "/createGoal");
+      console.log("posssss", post.response);
+      if (post.response) {
+        setTitle("");
+        setAmount("");
+
+        setIsRecurring(false);
+        setRecurrenceFrequency("");
+
+        setNextDueDate(null);
+        setAddGoal(false);
+        setNotifyModal(true);
+      }
+    } catch (error) {
+      console.error("Error creating", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchGoals = async () => {
+      const goals = await PostData(goalData, "/goals");
+      setGoalList(goals?.response?.items);
+    };
+
+    fetchGoals();
+  }, []);
+  console.log("all goals are available", goalList);
   const handleMonthChange = (increment: number) => {
     setCurrentMonth((prevMonth) => {
       const newMonth = prevMonth + increment;
@@ -167,7 +213,7 @@ const Goal: React.FC = () => {
 
   const allGoals = (
     <>
-      {goalsList.map((item, index) => (
+      {goalList.map((item: any, index: number) => (
         <div
           key={index}
           className="py-4 border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"
@@ -177,7 +223,7 @@ const Goal: React.FC = () => {
               className={`flex justify-center text-2xl items-center w-9 h-10 rounded-lg bg-opacity-5 mr-3 bg-customBlue border p-1`}
             >
               <Image
-                src={Iphone12}
+                src={item.imageUrl ? item.imageUrl : GoalImg}
                 alt=""
                 width={500}
                 height={500}
@@ -186,29 +232,42 @@ const Goal: React.FC = () => {
             </div>
             <div className="mr-auto">
               <h3 className="text-gray-950 font-normal text-sm">
-                {item.title}
+                {item?.title}
               </h3>
               <h3 className="text-sm font-semibold lg:hidden">
-                &#8358; {item.amount}
+                &#8358; {item?.goalAmount}
               </h3>
             </div>
           </div>
           <div className="lg:w-[55%] w-[25%] flex flex-col lg:flex-row justify-between items-end lg:items-center">
             <div className="mr-auto w-full lg:w-1/2">
               <p className=" text-customGray1 text-xs font-normal mb-2">
-                70/100%
+                {Math.round((item.currentAmount / item.goalAmount) * 100)}/100%
               </p>
-              <ProgressBar progress={20} addClassName="h-[6px]" />
+              <ProgressBar
+                progress={(item.currentAmount / item.goalAmount) * 100}
+                addClassName="h-[6px]"
+              />
             </div>
 
             <h3 className="text-base font-bold hidden lg:block">
-              &#8358; {item.amount}
+              &#8358; {item?.goalAmount.toLocaleString()}
             </h3>
           </div>
         </div>
       ))}
     </>
   );
+
+  const handleAmountChange = (e: any) => {
+    let inputValue = e.target.value;
+    inputValue = inputValue.replace(/[^0-9.]/g, "");
+    const decimalCount = (inputValue.match(/\./g) || []).length;
+    if (decimalCount > 1) {
+      inputValue = inputValue.slice(0, inputValue.lastIndexOf("."));
+    }
+    setAmount(inputValue);
+  };
 
   const addGoalForm = (
     <div className="lg:p-5 p-3 rounded-lg bg-[#fff] lg:w-[40vw] overflow-x-auto lg:max-h-[94vh] max-h-[80vh] no-scrollbar">
@@ -235,11 +294,23 @@ const Goal: React.FC = () => {
       </div>
       <div>
         <div className="w-full mb-3">
-          <InputGroup label="Title" placeholder="E.g vacation" type="text" />
+          <InputGroup
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            label="Title"
+            placeholder="E.g vacation"
+            type="text"
+          />
         </div>
 
         <div className="w-full mb-3">
-          <InputGroup label="Amount" placeholder="1,000" type="text" />
+          <InputGroup
+            value={`₦ ${amount}`}
+            onChange={(e) => handleAmountChange(e)}
+            label="Amount"
+            placeholder="1,000"
+            type="text"
+          />
         </div>
 
         <div className="p-4 rounded-lg mb-3 w-full border border-dashed border-[#D2D2D2] flex justify-center items-center flex-col">
@@ -257,77 +328,64 @@ const Goal: React.FC = () => {
           <p className="text-base text-customGray font-normal">
             Make Recurring
           </p>
-          <Switch onChange={() => setNewGoal(!newGoal)} checked={newGoal} />
+          <Switch
+            onChange={() => setIsRecurring(!isRecurring)}
+            checked={isRecurring}
+          />
         </div>
-        {newGoal && (
-          <>
-            <div className="my-4 p-3 rounded-lg border-2">
-              <div className="flex justify-between items-center mb-2">
-                <button
-                  className=" rotate-180"
-                  onClick={() => handleMonthChange(-1)}
-                >
-                  {arrowIcon}
-                </button>
-                <div className=" text-gray-950 font-bold text-xs">
-                  {months[currentMonth]} {currentYear}
-                </div>
-                <button onClick={() => handleMonthChange(1)}>
-                  {arrowIcon}
-                </button>
+        {isRecurring && (
+          <div className="my-4 p-3 rounded-lg border-2">
+            <div className="flex justify-between items-center mb-2">
+              <button
+                className=" rotate-180"
+                onClick={() => handleMonthChange(-1)}
+              >
+                {arrowIcon}
+              </button>
+              <div className=" text-gray-950 font-bold text-xs">
+                {months[currentMonth]} {currentYear}
               </div>
-              <div className="grid grid-cols-7 gap-2">
-                <div className="col-span-7 grid grid-cols-7 gap-2">
-                  {days.map((item: string, index: number) => (
-                    <div
-                      key={index}
-                      className="col-span-1 text-center text-customGray1 font-semibold text-xs"
-                    >
-                      {item}
-                    </div>
-                  ))}
-                </div>
-                {renderCalendar()}
+              <button onClick={() => handleMonthChange(1)}>{arrowIcon}</button>
+            </div>
+            <div className="grid grid-cols-7 gap-2">
+              <div className="col-span-7 grid grid-cols-7 gap-2">
+                {days.map((item: string, index: number) => (
+                  <div
+                    key={index}
+                    className="col-span-1 text-center text-customGray1 font-semibold text-xs"
+                  >
+                    {item}
+                  </div>
+                ))}
               </div>
-              {/* {selectedDate && (
+              {renderCalendar()}
+            </div>
+            {/* {selectedDate && (
                 <div className="mt-4">
                   <p className="text-lg">{selectedDate.toDateString()}</p>
                 </div>
               )} */}
-            </div>
-            <div className="grid grid-flow-row grid-cols-2 gap-2">
-              <div className="rounded-lg border p-3 mb-3 w-full">
-                <select
-                  name=""
-                  id=""
-                  className="w-full placeholder:bg-[#fff] bg-[#fff] focus:outline-none"
-                >
-                  <option value="Category">Frequency</option>
-                  <option value="Weekly">Weekly</option>
-                  <option value="Monthly">Monthly</option>
-                  <option value="Yearly">Yearly</option>
-                </select>
-              </div>
-              <div className="rounded-lg border p-3 mb-3 w-full">
-                <select
-                  name=""
-                  id=""
-                  className="w-full placeholder:bg-[#fff] bg-[#fff] focus:outline-none"
-                >
-                  <option value="Category">Ask before payment</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </select>
-              </div>
-            </div>
-          </>
+          </div>
         )}
-        <button
-          onClick={() => setAddGoal(false)}
-          className="flex justify-center items-center bg-customBlue text-white text-base font-medium py-3 px-4 rounded-lg hover:bg-opacity-80 w-full"
+        <div className="mb-3">
+          <SelectGroup
+            onChange={(e) => setRecurrenceFrequency(e.target.value)}
+            value={recurrenceFrequency}
+            placeholder="Frequency"
+            label=""
+            options={[
+              { label: "Monthly", value: "Monthly" },
+              { label: "Yearly", value: "Yearly" },
+            ]}
+          />
+        </div>
+
+        <Button
+          disabled={!title || !amount || !recurrenceFrequency ? true : false}
+          onClick={() => createGoal()}
         >
           Create
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -387,6 +445,14 @@ const Goal: React.FC = () => {
       </div>
 
       <div className="w-full mb-6 lg:mb-0">{allGoals}</div>
+      {notifyModal && (
+        <ModalComponent
+          lottie={LottieSuccess}
+          title="Successful!"
+          subtitle="A new goal has been created."
+          onClose={() => setNotifyModal(false)}
+        />
+      )}
       {addGoal ? <Modal onClose={handleCloseModal}>{addGoalForm}</Modal> : ""}
       <button
         onClick={() => setAddGoal(true)}

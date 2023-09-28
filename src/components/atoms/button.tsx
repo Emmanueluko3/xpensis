@@ -2,9 +2,15 @@ import React, { ButtonHTMLAttributes } from "react";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   className?: string;
+  disabled?: boolean;
 };
 
-const Button: React.FC<ButtonProps> = ({ children, className, ...rest }) => {
+const Button: React.FC<ButtonProps> = ({
+  children,
+  className,
+  disabled,
+  ...rest
+}) => {
   const defaultClassName =
     "rounded-lg flex items-center justify-center hover:opacity-80 text-white w-full font-bold py-3 px-6 bg-customBlue";
   const finalClassName = className
@@ -12,7 +18,12 @@ const Button: React.FC<ButtonProps> = ({ children, className, ...rest }) => {
     : defaultClassName;
 
   return (
-    <button {...rest} className={finalClassName}>
+    <button
+      {...rest}
+      className={finalClassName}
+      disabled={disabled}
+      style={{ cursor: disabled ? "not-allowed" : "pointer" }}
+    >
       {children}
     </button>
   );

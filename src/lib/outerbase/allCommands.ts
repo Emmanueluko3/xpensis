@@ -157,13 +157,13 @@ export async function PostData(PostData: any, endpoint: string) {
       body: JSON.stringify(PostData),
     });
     if (!response.ok) {
-      throw new Error(`Error fetching user Bills: ${response.statusText}`);
+      throw new Error(`Error fetching user data: ${response.statusText}`);
     }
     const data = await response.json();
 
     return data;
   } catch (error) {
-    console.error("Error fetching user Bills:", error);
+    console.error("Error fetching user data:", error);
     throw error;
   }
 }
