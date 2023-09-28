@@ -1,3 +1,5 @@
+import { getSession } from "next-auth/react";
+
 const dbUrl = process.env.OUTERBASE_API_URL;
 const clientDbUrl = process.env.NEXT_PUBLIC_OUTERBASE_API_URL;
 const apiKey = process.env.NEXT_PUBLIC_OUTERBASE_API_KEY;
@@ -146,9 +148,15 @@ export async function allBills(userId: string) {
 }
 
 export async function PostData(PostData: any, endpoint: string) {
-  PostData.api_key = apiKey;
-  PostData.userId = "15";
   try {
+    const session: any = await getSession();
+    if (!session) {
+      throw new Error("User not authenticated");
+    }
+
+    PostData.userId = session?.user?.items[0].userId;
+    PostData.api_key = apiKey;
+
     const response = await fetch(clientDbUrl + endpoint, {
       method: "POST",
       headers: {
