@@ -12,6 +12,7 @@ import SelectGroup from "../molecules/inputGroup/selectGroup";
 import { PostData } from "@/lib/outerbase/allCommands";
 import ModalComponent from "../molecules/Modals/modalComponent";
 import Button from "../atoms/button";
+import DeleteModal from "../molecules/Modals/deleteModal";
 
 const arrowIcon = (
   <svg
@@ -26,6 +27,45 @@ const arrowIcon = (
       clip-rule="evenodd"
       d="M12.293 5.29303C12.4805 5.10556 12.7348 5.00024 13 5.00024C13.2652 5.00024 13.5195 5.10556 13.707 5.29303L17.707 9.29303C17.8945 9.48056 17.9998 9.73487 17.9998 10C17.9998 10.2652 17.8945 10.5195 17.707 10.707L13.707 14.707C13.5184 14.8892 13.2658 14.99 13.0036 14.9877C12.7414 14.9854 12.4906 14.8803 12.3052 14.6948C12.1198 14.5094 12.0146 14.2586 12.0123 13.9964C12.01 13.7342 12.1108 13.4816 12.293 13.293L14.586 11H3C2.73478 11 2.48043 10.8947 2.29289 10.7071C2.10536 10.5196 2 10.2652 2 10C2 9.73481 2.10536 9.48046 2.29289 9.29292C2.48043 9.10539 2.73478 9.00003 3 9.00003H14.586L12.293 6.70703C12.1055 6.5195 12.0002 6.26519 12.0002 6.00003C12.0002 5.73487 12.1055 5.48056 12.293 5.29303Z"
       fill="#1E1E1E"
+    />
+  </svg>
+);
+const trashIcon = (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M21 5.98047C17.67 5.65047 14.32 5.48047 10.98 5.48047C9 5.48047 7.02 5.58047 5.04 5.78047L3 5.98047"
+      stroke="#C41B04"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8.5 4.97L8.72 3.66C8.88 2.71 9 2 10.69 2H13.31C15 2 15.13 2.75 15.28 3.67L15.5 4.97"
+      stroke="#C41B04"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M18.85 9.13965L18.2 19.2096C18.09 20.7796 18 21.9996 15.21 21.9996H8.79C6 21.9996 5.91 20.7796 5.8 19.2096L5.15 9.13965"
+      stroke="#C41B04"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M10.33 16.5H13.66"
+      stroke="#C41B04"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9.5 12.5H14.5"
+      stroke="#C41B04"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 );
@@ -118,7 +158,8 @@ const Goal: React.FC = () => {
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurrenceFrequency, setRecurrenceFrequency] = useState("");
   const [nextDueDate, setNextDueDate] = useState<Date | null>(null);
-  const [notifyModal, setNotifyModal] = useState(false);
+  const [notifyModal, setNotifyModal] = useState<any>(null);
+  const [deleteGoal, setDeleteGoal] = useState<any>(null);
   const goalData = {
     title: title,
     goalAmount: amount,
@@ -131,8 +172,7 @@ const Goal: React.FC = () => {
   const createGoal = async () => {
     try {
       const post = await PostData(goalData, "/createGoal");
-      console.log("posssss", post.response);
-      if (post.response) {
+      if (post) {
         setTitle("");
         setAmount("");
 
@@ -141,10 +181,30 @@ const Goal: React.FC = () => {
 
         setNextDueDate(null);
         setAddGoal(false);
-        setNotifyModal(true);
+        setNotifyModal({
+          lottie: LottieSuccess,
+          title: "Successful!",
+          subtitle: "A new goal has been created.",
+        });
       }
     } catch (error) {
       console.error("Error creating", error);
+    }
+  };
+
+  const deleteOneGoal = async (id: any) => {
+    try {
+      const post = await PostData({ billId: id }, "/deleteOneGoal");
+      if (post) {
+        setNotifyModal({
+          lottie: LottieSuccess,
+          title: "Successful!",
+          subtitle: "Goal has been Deleted!",
+        });
+      }
+      setDeleteGoal(null);
+    } catch (error) {
+      console.error("Error deleting", error);
     }
   };
 
@@ -214,46 +274,56 @@ const Goal: React.FC = () => {
   const allGoals = (
     <>
       {goalList?.map((item: any, index: number) => (
-        <div
-          key={index}
-          className="py-4 border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"
-        >
-          <div className="lg:w-[45%] w-[70%] flex justify-center items-center">
-            <div
-              className={`flex justify-center text-2xl items-center w-9 h-10 rounded-lg bg-opacity-5 mr-3 bg-customBlue border p-1`}
-            >
-              <Image
-                src={item.imageUrl ? item.imageUrl : GoalImg}
-                alt=""
-                width={500}
-                height={500}
-                className=" w-full h-full"
-              />
+        <div className="flex items-center border-b-[0.1px] border-[#D2D2D2] mb-2">
+          <div
+            key={index}
+            className="py-4 border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"
+          >
+            <div className="lg:w-[45%] w-[70%] flex justify-center items-center">
+              <div
+                className={`flex justify-center text-2xl items-center w-9 h-10 rounded-lg bg-opacity-5 mr-3 bg-customBlue border p-1`}
+              >
+                <Image
+                  src={item.imageUrl ? item.imageUrl : GoalImg}
+                  alt=""
+                  width={500}
+                  height={500}
+                  className=" w-full h-full"
+                />
+              </div>
+              <div className="mr-auto">
+                <h3 className="text-gray-950 font-normal text-sm">
+                  {item?.title}
+                </h3>
+                <h3 className="text-sm font-semibold lg:hidden">
+                  &#8358; {item?.goalAmount}
+                </h3>
+              </div>
             </div>
-            <div className="mr-auto">
-              <h3 className="text-gray-950 font-normal text-sm">
-                {item?.title}
-              </h3>
-              <h3 className="text-sm font-semibold lg:hidden">
-                &#8358; {item?.goalAmount}
-              </h3>
-            </div>
-          </div>
-          <div className="lg:w-[55%] w-[25%] flex flex-col lg:flex-row justify-between items-end lg:items-center">
-            <div className="mr-auto w-full lg:w-1/2">
-              <p className=" text-customGray1 text-xs font-normal mb-2">
-                {Math.round((item.currentAmount / item.goalAmount) * 100)}/100%
-              </p>
-              <ProgressBar
-                progress={(item.currentAmount / item.goalAmount) * 100}
-                addClassName="h-[6px]"
-              />
-            </div>
+            <div className="lg:w-[55%] w-[25%] flex flex-col lg:flex-row justify-between items-end lg:items-center">
+              <div className="mr-auto w-full lg:w-1/2">
+                <p className=" text-customGray1 text-xs font-normal mb-2">
+                  {Math.round((item.currentAmount / item.goalAmount) * 100)}
+                  /100%
+                </p>
+                <ProgressBar
+                  progress={(item.currentAmount / item.goalAmount) * 100}
+                  addClassName="h-[6px]"
+                />
+              </div>
 
-            <h3 className="text-base font-bold hidden lg:block">
-              &#8358; {item?.goalAmount.toLocaleString()}
-            </h3>
+              <h3 className="text-base font-bold hidden lg:block">
+                &#8358; {item?.goalAmount.toLocaleString()}
+              </h3>
+            </div>
           </div>
+
+          <button
+            onClick={() => setDeleteGoal(item)}
+            className="ml-5 w-8 h-8 flex p-1 items-center bg-customRed bg-opacity-10 rounded-full"
+          >
+            {trashIcon}
+          </button>
         </div>
       ))}
     </>
@@ -445,12 +515,21 @@ const Goal: React.FC = () => {
       </div>
 
       <div className="w-full mb-6 lg:mb-0">{allGoals}</div>
+
       {notifyModal && (
         <ModalComponent
-          lottie={LottieSuccess}
-          title="Successful!"
-          subtitle="A new goal has been created."
-          onClose={() => setNotifyModal(false)}
+          lottie={notifyModal.lottie}
+          title={notifyModal.title}
+          subtitle={notifyModal.subtitle}
+          onClose={() => setNotifyModal(null)}
+        />
+      )}
+      {deleteGoal && (
+        <DeleteModal
+          onClose={() => setDeleteGoal(null)}
+          onDelete={() => deleteOneGoal(deleteGoal?.billId)}
+          title="Delete"
+          subtitle="Are you sure you want to delete this Goal?"
         />
       )}
       {addGoal ? <Modal onClose={handleCloseModal}>{addGoalForm}</Modal> : ""}
