@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import Modal from "../molecules/Modals/modal";
 import { useSession } from "next-auth/react";
 import { AllTransactions } from "@/lib/outerbase/allCommands";
+import LottieSpinner from "@/../public/assets/lotties/spinner.json";
+import Lottie from "../atoms/lottie";
 
 const spendingIcon = (
   <svg
@@ -94,30 +96,36 @@ const Transactions: React.FC = () => {
         </button>
       </div>
       <div className="w-full">
-        {allTransactions.map((item: any, index) => (
-          <div
-            key={index}
-            className="py-4 border-b border-[#D2D2D2] w-full flex justify-between mb-2"
-          >
+        {allTransactions ? (
+          allTransactions.map((item: any, index) => (
             <div
-              className={`flex justify-center text-2xl items-center w-9 h-9 rounded-full bg-opacity-5 mr-3 ${
-                item.type === "credit" ? "bg-customGreen" : "bg-customRed"
-              }`}
+              key={index}
+              className="py-4 border-b border-[#D2D2D2] w-full flex justify-between mb-2"
             >
-              {item.type === "credit" ? fundingIcon : spendingIcon}
+              <div
+                className={`flex justify-center text-2xl items-center w-9 h-9 rounded-full bg-opacity-5 mr-3 ${
+                  item.type === "credit" ? "bg-customGreen" : "bg-customRed"
+                }`}
+              >
+                {item.type === "credit" ? fundingIcon : spendingIcon}
+              </div>
+              <div className="mr-auto">
+                {" "}
+                <h3 className="text-gray-950 font-medium text-sm mb-2">
+                  {item.type === "credit" ? "Wallet Funding" : item.title}
+                </h3>
+                <p className=" text-customGray1 text-xs font-medium">
+                  {formatDate(item.date)}
+                </p>
+              </div>
+              <h3 className="text-base font-medium">&#8358; {item.amount}.0</h3>
             </div>
-            <div className="mr-auto">
-              {" "}
-              <h3 className="text-gray-950 font-medium text-sm mb-2">
-                {item.type === "credit" ? "Wallet Funding" : item.title}
-              </h3>
-              <p className=" text-customGray1 text-xs font-medium">
-                {formatDate(item.date)}
-              </p>
-            </div>
-            <h3 className="text-base font-medium">&#8358; {item.amount}.0</h3>
+          ))
+        ) : (
+          <div>
+            <Lottie lottie={LottieSpinner} />
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
