@@ -194,7 +194,7 @@ const Goal: React.FC = () => {
 
   const deleteOneGoal = async (id: any) => {
     try {
-      const post = await PostData({ billId: id }, "/deleteOneGoal");
+      const post = await PostData({ goalId: id }, "/deleteOneGoal");
       if (post) {
         setNotifyModal({
           lottie: LottieSuccess,
