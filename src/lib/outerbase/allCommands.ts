@@ -38,26 +38,26 @@ export async function findOneUser(email: string) {
   }
 }
 
-export async function UserProfile(userId: string) {
-  try {
-    const response = await fetch(`${clientDbUrl}/profile`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId: userId, api_key: apiKey }),
-    });
-    if (!response.ok) {
-      throw new Error(`Error fetching user profile: ${response.statusText}`);
-    }
-    const data = await response.json();
+// export async function UserProfile(userId: string) {
+//   try {
+//     const response = await fetch(`${clientDbUrl}/profile`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({ userId: userId, api_key: apiKey }),
+//     });
+//     if (!response.ok) {
+//       throw new Error(`Error fetching user profile: ${response.statusText}`);
+//     }
+//     const data = await response.json();
 
-    return data.item.items[0];
-  } catch (error) {
-    console.error("Error fetching user profile:", error);
-    throw error;
-  }
-}
+//     return data.item.items[0];
+//   } catch (error) {
+//     console.error("Error fetching user profile:", error);
+//     throw error;
+//   }
+// }
 
 export async function UserNotifications(userId: string) {
   try {
@@ -154,7 +154,7 @@ export async function PostData(PostData: any, endpoint: string) {
       throw new Error("User not authenticated");
     }
 
-    PostData.userId = session?.user?.items[0].userId;
+    PostData.userId = session?.user?.items[0]?.userId.toString();
     PostData.api_key = apiKey;
 
     const response = await fetch(clientDbUrl + endpoint, {

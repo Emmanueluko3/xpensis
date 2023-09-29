@@ -7,8 +7,8 @@ import SelectGroup from "../molecules/inputGroup/selectGroup";
 import Button from "../atoms/button";
 import Card from "../molecules/cards/card";
 import Switch from "../atoms/switch";
-import { signOut, useSession } from "next-auth/react";
-import { UserProfile } from "@/lib/outerbase/allCommands";
+import { signOut } from "next-auth/react";
+import { PostData } from "@/lib/outerbase/allCommands";
 
 const plusIcon = (
   <svg
@@ -109,15 +109,9 @@ const allNotifications = [
   { type: "Email Notifications", description: "Get notified via email" },
 ];
 
-interface userProfileComponentProps {
-  userData: any;
-  financialData: any;
-}
-
-const ProfileComponent: React.FC<userProfileComponentProps> = ({
-  userData,
-  financialData,
-}) => {
+const ProfileComponent: React.FC = () => {
+  const [userData, setUserData] = useState<any>([]);
+  const [financialData, setFinancialData] = useState<any>([]);
   const [fullName, setFullName] = useState(userData?.fullName);
   const [email, setEmail] = useState(userData?.email);
   const [phoneNumber, setPhoneNumber] = useState(userData?.phoneNumber);
@@ -147,15 +141,40 @@ const ProfileComponent: React.FC<userProfileComponentProps> = ({
   ];
 
   useEffect(() => {
-    setFullName(userData?.fullName);
-    setEmail(userData?.email);
-    setPhoneNumber(userData?.phoneNumber);
-    setCountry(userData?.country);
-    setState(userData?.state);
-    setCity(userData?.city);
+    const fetchData = async () => {
+      try {
+        const financialData = await PostData({}, "/financialData");
+        setFinancialData(financialData);
+      } catch (error) {
+        console.error("Error in fetchData:", error);
+      }
+    };
+    fetchData();
+
+    const fetchDataInterval = setInterval(fetchData, 5000);
+
+    return () => clearInterval(fetchDataInterval);
   }, [userData]);
 
-  console.log("finance: ", financialData);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const profileData = await PostData({}, "/profile");
+        setUserData(profileData[0]);
+        if (userData) {
+          setFullName(userData?.fullName);
+          setEmail(userData?.email);
+          setPhoneNumber(userData?.phoneNumber);
+          setCountry(userData?.country);
+          setState(userData?.state);
+          setCity(userData?.city);
+        }
+      } catch (error) {
+        console.error("Error in fetchData:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="grid grid-flow-row grid-cols-5 gap-3">
@@ -168,7 +187,9 @@ const ProfileComponent: React.FC<userProfileComponentProps> = ({
           <div className=" w-28 h-28 lg:mr-5 mb-5 lg:mb-0">
             <Image
               src={
-                userData.profilePicture ? userData.profilePicture : ProfilePics
+                userData?.profilePicture
+                  ? userData?.profilePicture
+                  : ProfilePics
               }
               width={500}
               height={500}
