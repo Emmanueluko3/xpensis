@@ -386,8 +386,11 @@ const Bill: React.FC = () => {
         .filter((item) => item.isRecurring === 1)
         ?.sort(sortByDate)
         ?.map((item, index) => (
-          <div className="flex items-center border-b-[0.1px] border-[#D2D2D2] mb-2">
-            <div key={index} className="py-4 w-full flex justify-between">
+          <div
+            key={index}
+            className="flex items-center border-b-[0.1px] border-[#D2D2D2] mb-2"
+          >
+            <div className="py-4 w-full flex justify-between">
               <div className="w-full flex justify-center items-center">
                 <div
                   className={`flex justify-center text-2xl items-center w-9 h-9 rounded-full bg-opacity-5 mr-3 bg-customBlue`}
@@ -440,10 +443,12 @@ const Bill: React.FC = () => {
         ?.filter((item) => item.isRecurring === 0)
         ?.sort(sortByDate)
         ?.map((item, index) => (
-          <div className="flex items-center border-b-[0.1px] border-[#D2D2D2] mb-2">
+          <div
+            key={index}
+            className="flex items-center border-b-[0.1px] border-[#D2D2D2] mb-2"
+          >
             <div
               onClick={() => setPayBill(item)}
-              key={index}
               className="py-4 cursor-pointer  w-full flex justify-between"
             >
               <div className="lg:w-[45%] w-[70%] flex justify-center items-center">

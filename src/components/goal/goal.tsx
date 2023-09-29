@@ -274,11 +274,11 @@ const Goal: React.FC = () => {
   const allGoals = (
     <>
       {goalList?.map((item: any, index: number) => (
-        <div className="flex items-center border-b-[0.1px] border-[#D2D2D2] mb-2">
-          <div
-            key={index}
-            className="py-4 border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"
-          >
+        <div
+          key={index}
+          className="flex items-center border-b-[0.1px] border-[#D2D2D2] mb-2"
+        >
+          <div className="py-4 border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2">
             <div className="lg:w-[45%] w-[70%] flex justify-center items-center">
               <div
                 className={`flex justify-center text-2xl items-center w-9 h-10 rounded-lg bg-opacity-5 mr-3 bg-customBlue border p-1`}
