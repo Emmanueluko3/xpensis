@@ -353,7 +353,7 @@ const FormSection: React.FC = () => {
                       onChange={() => setRememberMe(!rememberMe)}
                       type="checkbox"
                       id="checkbox"
-                      className="rounded-md cursor-pointer"
+                      className="rounded-md cursor-pointer h-4 w-4"
                     />
                   </div>
                   <label
@@ -371,7 +371,7 @@ const FormSection: React.FC = () => {
                       onChange={() => setChecked(!checked)}
                       type="checkbox"
                       id="terms"
-                      className="rounded-md"
+                      className="rounded-md h-4 w-4"
                     />
                   </div>
                   <label

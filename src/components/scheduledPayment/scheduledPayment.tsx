@@ -13,7 +13,7 @@ const ScheduledPayment: React.FC = () => {
     async function fetchUserBills() {
       try {
         const data = await PostData({}, "/bills");
-        setUserBills(data.response.items);
+        setUserBills(data.items);
       } catch (error) {
         console.error("Error in fetchUserBills:", error);
       }

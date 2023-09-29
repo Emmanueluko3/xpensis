@@ -151,7 +151,7 @@ const Goal: React.FC = () => {
   useEffect(() => {
     const fetchGoals = async () => {
       const goals = await PostData({}, "/goals");
-      setGoalList(goals?.response?.items);
+      setGoalList(goals?.items);
     };
 
     fetchGoals();
@@ -213,7 +213,7 @@ const Goal: React.FC = () => {
 
   const allGoals = (
     <>
-      {goalList.map((item: any, index: number) => (
+      {goalList?.map((item: any, index: number) => (
         <div
           key={index}
           className="py-4 border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"

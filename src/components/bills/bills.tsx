@@ -11,7 +11,7 @@ import SelectGroup from "../molecules/inputGroup/selectGroup";
 import Card from "../molecules/cards/card";
 import { PostData } from "@/lib/outerbase/allCommands";
 import ModalComponent from "../molecules/Modals/modalComponent";
-import { useSession } from "next-auth/react";
+import DeleteModal from "../molecules/Modals/deleteModal";
 
 const energyIcon = (
   <svg
@@ -33,13 +33,7 @@ const energyIcon = (
 );
 
 const trashIcon = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="currentWidth"
-    height="currentHeight"
-    viewBox="0 0 24 24"
-    fill="none"
-  >
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
     <path
       d="M21 5.98047C17.67 5.65047 14.32 5.48047 10.98 5.48047C9 5.48047 7.02 5.58047 5.04 5.78047L3 5.98047"
       stroke="#C41B04"
@@ -112,51 +106,6 @@ const addIcon = (
   </svg>
 );
 
-const recentTransactions = [
-  {
-    title: "Rent",
-    amount: 120000,
-    date: "15/5/23",
-    status: "Paid",
-  },
-  {
-    title: "Rent",
-    amount: 120000,
-    date: "15/5/23",
-    status: "Pending",
-  },
-  {
-    title: "Wallet Funding",
-    amount: 2220000,
-    date: "15/5/23",
-    status: "Paid",
-  },
-  {
-    title: "Rent",
-    amount: 120000,
-    date: "15/5/23",
-    status: "Pending",
-  },
-  {
-    title: "Rent",
-    amount: 120000,
-    date: "15/5/23",
-    status: "Pending",
-  },
-  {
-    title: "Wallet Funding",
-    amount: 2220000,
-    date: "15/5/23",
-    status: "Paid",
-  },
-  {
-    title: "Rent",
-    amount: 120000,
-    date: "15/5/23",
-    status: "Pending",
-  },
-];
-
 type SortFunction<T> = (a: T, b: T) => number;
 
 const sortByDate: SortFunction<any> = (a, b) =>
@@ -197,10 +146,11 @@ const allBanks = [
 const Bill: React.FC = () => {
   const [tab, setTab] = useState(0);
   const [addCategory, setAddCategory] = useState(false);
-  const [notifyModal, setNotifyModal] = useState(false);
+  const [notifyModal, setNotifyModal] = useState<any>(null);
   const [newBill, setNewBill] = useState(false);
   const [payBill, setPayBill] = useState<any>(null);
   const tabs = ["Recurring Bills", "Non-recurring Bills"];
+  const [deleteCategory, setDeleteCategory] = useState<any>(null);
 
   // fetchedBill
   const [userBills, setUserBills] = useState<any[]>([]);
@@ -208,9 +158,9 @@ const Bill: React.FC = () => {
     async function fetchUserBills() {
       try {
         const data = await PostData({}, "/bills");
-        setUserBills(data.response.items);
+        setUserBills(data?.items);
       } catch (error) {
-        console.error("Error in fetchUserBills:", error);
+        console.error("Error in fetchUserBills  hjs:", error);
       }
     }
     fetchUserBills();
@@ -240,7 +190,7 @@ const Bill: React.FC = () => {
     try {
       const post = await PostData(billData, "/createBills");
       console.log("posssss", post.response);
-      if (post.response.ok) {
+      if (post.items) {
         setTitle("");
         setAmount("");
         setSeeAlert(false);
@@ -249,11 +199,31 @@ const Bill: React.FC = () => {
         setAskForPayment("");
         setNextDueDate(null);
         setCategoryTitle("");
+        setNotifyModal({
+          lottie: LottieSuccess,
+          title: "Successful!",
+          subtitle: "A new category has been added",
+        });
       }
       setAddCategory(false);
-      setNotifyModal(true);
     } catch (error) {
       console.error("Error creating", error);
+    }
+  };
+
+  const deleteBill = async (id: any) => {
+    try {
+      const post = await PostData({ billId: id }, "/deleteBill");
+      if (post) {
+        setNotifyModal({
+          lottie: LottieSuccess,
+          title: "Successful!",
+          subtitle: "Category has been Deleted!",
+        });
+      }
+      setDeleteCategory(null);
+    } catch (error) {
+      console.error("Error deleting", error);
     }
   };
 
@@ -416,42 +386,49 @@ const Bill: React.FC = () => {
         .filter((item) => item.isRecurring === 1)
         ?.sort(sortByDate)
         ?.map((item, index) => (
-          <div
-            key={index}
-            className="py-4 border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"
-          >
-            <div className="w-full flex justify-center items-center">
-              <div
-                className={`flex justify-center text-2xl items-center w-9 h-9 rounded-full bg-opacity-5 mr-3 bg-customBlue`}
-              >
-                {energyIcon}
-              </div>
-              <div className="mr-auto">
-                <h3 className="text-gray-950 font-normal text-sm mb-1">
-                  {item.title}
-                </h3>
-                <p className=" text-customGray1 text-xs font-normal">
-                  {formatDate(item.nextDueDate)}
-                </p>
-              </div>
-            </div>
-            <div className="w-full flex flex-col lg:flex-row justify-between items-end lg:items-center">
-              <div className="lg:w-1/2 flex lg:items-center justify-center">
-                <span
-                  className={`${
-                    item.status === "Paid"
-                      ? "bg-customDarkGreen"
-                      : "bg-customDarkRed"
-                  } bg-opacity-10 px-3 lg:py-1 mb-1 lg:mb-0 rounded-full text-xs`}
+          <div className="flex items-center border-b-[0.1px] border-[#D2D2D2] mb-2">
+            <div key={index} className="py-4 w-full flex justify-between">
+              <div className="w-full flex justify-center items-center">
+                <div
+                  className={`flex justify-center text-2xl items-center w-9 h-9 rounded-full bg-opacity-5 mr-3 bg-customBlue`}
                 >
-                  {item.currentAmount === item.limitAmount ? "Paid" : "Pending"}
-                </span>
+                  {energyIcon}
+                </div>
+                <div className="mr-auto">
+                  <h3 className="text-gray-950 font-normal text-sm mb-1">
+                    {item.title}
+                  </h3>
+                  <p className=" text-customGray1 text-xs font-normal">
+                    {formatDate(item.nextDueDate)}
+                  </p>
+                </div>
               </div>
+              <div className="w-full flex flex-col lg:flex-row justify-between items-end lg:items-center">
+                <div className="lg:w-1/2 flex lg:items-center justify-center">
+                  <span
+                    className={`${
+                      item.status === "Paid"
+                        ? "bg-customDarkGreen"
+                        : "bg-customDarkRed"
+                    } bg-opacity-10 px-3 lg:py-1 mb-1 lg:mb-0 rounded-full text-xs`}
+                  >
+                    {item.currentAmount === item.limitAmount
+                      ? "Paid"
+                      : "Pending"}
+                  </span>
+                </div>
 
-              <h3 className="lg:text-base text-sm font-semibold lg:font-bold">
-                &#8358; {item.limitAmount.toLocaleString()}
-              </h3>
+                <h3 className="lg:text-base text-sm font-semibold lg:font-bold">
+                  &#8358; {item.limitAmount.toLocaleString()}
+                </h3>
+              </div>
             </div>
+            <button
+              onClick={() => setDeleteCategory(item)}
+              className="ml-5 w-8 h-8 flex p-1 items-center bg-customRed bg-opacity-10 rounded-full"
+            >
+              {trashIcon}
+            </button>
           </div>
         ))}
     </>
@@ -463,49 +440,54 @@ const Bill: React.FC = () => {
         ?.filter((item) => item.isRecurring === 0)
         ?.sort(sortByDate)
         ?.map((item, index) => (
-          <div
-            onClick={() => setPayBill(item)}
-            key={index}
-            className="py-4 cursor-pointer border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"
-          >
-            <div className="lg:w-[45%] w-[70%] flex justify-center items-center">
-              <div
-                className={`flex justify-center text-2xl items-center w-9 h-9 rounded-full bg-opacity-5 mr-3 bg-customBlue`}
-              >
-                {energyIcon}
+          <div className="flex items-center border-b-[0.1px] border-[#D2D2D2] mb-2">
+            <div
+              onClick={() => setPayBill(item)}
+              key={index}
+              className="py-4 cursor-pointer  w-full flex justify-between"
+            >
+              <div className="lg:w-[45%] w-[70%] flex justify-center items-center">
+                <div
+                  className={`flex justify-center text-2xl items-center w-9 h-9 rounded-full bg-opacity-5 mr-3 bg-customBlue`}
+                >
+                  {energyIcon}
+                </div>
+                <div className="mr-auto">
+                  <h3 className="text-gray-950 font-normal text-sm">
+                    {item.title}
+                  </h3>
+                  <h3 className="text-sm font-semibold lg:hidden">
+                    &#8358; {item.currentAmount.toLocaleString()}
+                    <span className=" text-xs font-normal">
+                      / &#8358;{item.limitAmount.toLocaleString()}
+                    </span>
+                  </h3>
+                </div>
               </div>
-              <div className="mr-auto">
-                <h3 className="text-gray-950 font-normal text-sm">
-                  {item.title}
-                </h3>
-                <h3 className="text-sm font-semibold lg:hidden">
+              <div className="lg:w-[55%] w-[25%] flex flex-col lg:flex-row justify-between items-end lg:items-center">
+                <div className="mr-auto w-full lg:w-1/2">
+                  <p className=" text-customGray1 text-xs font-normal mb-2">
+                    {Math.round((item.currentAmount / item.limitAmount) * 100)}
+                    /100%
+                  </p>
+                  <ProgressBar
+                    progress={(item.currentAmount / item.limitAmount) * 100}
+                    addClassName="h-[6px]"
+                  />
+                </div>
+
+                <h3 className="text-base font-bold hidden lg:block">
                   &#8358; {item.currentAmount.toLocaleString()}
-                  <span className=" text-xs font-normal">
+                  <span className=" text-sm font-normal">
                     / &#8358;{item.limitAmount.toLocaleString()}
                   </span>
                 </h3>
               </div>
             </div>
-            <div className="lg:w-[55%] w-[25%] flex flex-col lg:flex-row justify-between items-end lg:items-center">
-              <div className="mr-auto w-full lg:w-1/2">
-                <p className=" text-customGray1 text-xs font-normal mb-2">
-                  {Math.round((item.currentAmount / item.limitAmount) * 100)}
-                  /100%
-                </p>
-                <ProgressBar
-                  progress={(item.currentAmount / item.limitAmount) * 100}
-                  addClassName="h-[6px]"
-                />
-              </div>
-
-              <h3 className="text-base font-bold hidden lg:block">
-                &#8358; {item.currentAmount.toLocaleString()}
-                <span className=" text-sm font-normal">
-                  / &#8358;{item.limitAmount.toLocaleString()}
-                </span>
-              </h3>
-            </div>
-            <button className="ml-5 w-8 h-8 flex p-1 items-center bg-customRed bg-opacity-10 rounded-full">
+            <button
+              onClick={() => setDeleteCategory(item)}
+              className="ml-5 w-8 h-8 flex p-1 items-center bg-customRed bg-opacity-10 rounded-full"
+            >
               {trashIcon}
             </button>
           </div>
@@ -652,7 +634,13 @@ const Bill: React.FC = () => {
         )}
         <div className="w-full">
           <Button
-            disabled={!title || !amount || !categoryTitle ? true : false}
+            disabled={
+              !amount ||
+              !categoryTitle ||
+              (categoryTitle === "Others" && !title)
+                ? true
+                : false
+            }
             onClick={() => createBill()}
           >
             Create
@@ -762,6 +750,14 @@ const Bill: React.FC = () => {
 
   return (
     <div className="rounded-lg bg-[#fff] w-full p-5">
+      {deleteCategory && (
+        <DeleteModal
+          onClose={() => setDeleteCategory(null)}
+          onDelete={() => deleteBill(deleteCategory?.billId)}
+          title="Delete"
+          subtitle="Are you sure you want to delete this category?"
+        />
+      )}
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center justify-between lg:w-auto w-full">
           {tabs.map((item, index) => (
@@ -794,10 +790,10 @@ const Bill: React.FC = () => {
       </div>
       {notifyModal && (
         <ModalComponent
-          lottie={LottieSuccess}
-          title="Successful!"
-          subtitle="A new category has been added"
-          onClose={() => setNotifyModal(false)}
+          lottie={notifyModal.lottie}
+          title={notifyModal.title}
+          subtitle={notifyModal.subtitle}
+          onClose={() => setNotifyModal(null)}
         />
       )}
       {addCategory && (
