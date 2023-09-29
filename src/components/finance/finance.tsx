@@ -5,25 +5,24 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Pagination } from "swiper/modules";
 import Card from "../molecules/cards/card";
-import { useSession } from "next-auth/react";
-import { FinancialData } from "@/lib/outerbase/allCommands";
+import { PostData } from "@/lib/outerbase/allCommands";
 
 const Finance: React.FC = () => {
-  const { data: session }: any = useSession();
-
-  const userId = session?.user?.items[0]?.userId;
   const [financialData, setFinancialData] = useState([]);
   useEffect(() => {
     async function fetchFinancialData() {
       try {
-        const data = await FinancialData(userId?.toString());
+        const data = await PostData({}, "/financialData");
         setFinancialData(data);
       } catch (error) {
         console.error("Error in fetchFinancialData:", error);
       }
     }
+
     fetchFinancialData();
-  }, [userId]);
+    const fetchDataInterval = setInterval(fetchFinancialData, 5000);
+    return () => clearInterval(fetchDataInterval);
+  }, []);
   const financialCategories = [
     {
       duration: "Last Month",

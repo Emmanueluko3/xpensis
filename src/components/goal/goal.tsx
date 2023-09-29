@@ -215,8 +215,10 @@ const Goal: React.FC = () => {
     };
 
     fetchGoals();
+    const fetchDataInterval = setInterval(fetchGoals, 5000);
+    return () => clearInterval(fetchDataInterval);
   }, []);
-  console.log("all goals are available", goalList);
+  // console.log("all goals are available", goalList);
   const handleMonthChange = (increment: number) => {
     setCurrentMonth((prevMonth) => {
       const newMonth = prevMonth + increment;

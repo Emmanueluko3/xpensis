@@ -19,6 +19,8 @@ const ScheduledPayment: React.FC = () => {
       }
     }
     fetchUserBills();
+    const fetchDataInterval = setInterval(fetchUserBills, 5000);
+    return () => clearInterval(fetchDataInterval);
   }, []);
   return (
     <div className="bg-[#fff] w-full rounded-lg p-5">

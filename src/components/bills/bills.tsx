@@ -155,15 +155,17 @@ const Bill: React.FC = () => {
   // fetchedBill
   const [userBills, setUserBills] = useState<any[]>([]);
   useEffect(() => {
-    async function fetchUserBills() {
+    const fetchData = async () => {
       try {
         const data = await PostData({}, "/bills");
         setUserBills(data?.items);
       } catch (error) {
-        console.error("Error in fetchUserBills  hjs:", error);
+        console.error("Error in fetchUserBills:", error);
       }
-    }
-    fetchUserBills();
+    };
+    fetchData();
+    const fetchDataInterval = setInterval(fetchData, 5000);
+    return () => clearInterval(fetchDataInterval);
   }, []);
 
   // bill input fields

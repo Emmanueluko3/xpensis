@@ -1,8 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Modal from "../molecules/Modals/modal";
-import { useSession } from "next-auth/react";
-import { AllTransactions } from "@/lib/outerbase/allCommands";
+import { PostData } from "@/lib/outerbase/allCommands";
 import LottieSpinner from "@/../public/assets/lotties/spinner.json";
 import Lottie from "../atoms/lottie";
 
@@ -43,22 +42,21 @@ const fundingIcon = (
 );
 
 const Transactions: React.FC = () => {
-  const { data: session }: any = useSession();
-  const userId = session?.user?.items[0]?.userId;
   const [allTransactions, setAllTransactions] = useState([]);
   const [viewAllTransactions, setViewAllTransactions] = useState(false);
-  console.log("Financial Data", allTransactions);
   useEffect(() => {
     async function fetchTransactions() {
       try {
-        const data = await AllTransactions(userId?.toString());
+        const data = await PostData({}, "/allTransactions");
         setAllTransactions(data);
       } catch (error) {
         console.error("Error in fetchTransactions:", error);
       }
     }
     fetchTransactions();
-  }, [userId]);
+    const fetchDataInterval = setInterval(fetchTransactions, 5000);
+    return () => clearInterval(fetchDataInterval);
+  }, []);
 
   function formatDate(inputDate: string) {
     const date = new Date(inputDate);
@@ -95,8 +93,8 @@ const Transactions: React.FC = () => {
           </svg>
         </button>
       </div>
-      <div className="w-full">
-        {allTransactions ? (
+      <div className="w-full overflow-y-auto no-scrollbar">
+        {allTransactions.length >= 0 ? (
           allTransactions.map((item: any, index) => (
             <div
               key={index}
@@ -145,12 +143,14 @@ const Transactions: React.FC = () => {
         <h3 className="text-gray-950 font-bold text-base">
           Recent Transactions
         </h3>
-        <button
-          onClick={() => setViewAllTransactions(true)}
-          className="text-sm text-customGray1 hover:text-gray-700"
-        >
-          View all
-        </button>
+        {allTransactions.length >= 5 && (
+          <button
+            onClick={() => setViewAllTransactions(true)}
+            className="text-sm text-customGray1 hover:text-gray-700"
+          >
+            View all
+          </button>
+        )}
       </div>
       <div className="w-full">
         {allTransactions?.map((item: any, index) => (

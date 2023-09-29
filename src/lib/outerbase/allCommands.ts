@@ -80,28 +80,28 @@ export async function UserNotifications(userId: string) {
   }
 }
 
-export async function FinancialData(userId: string) {
-  try {
-    const response = await fetch(`${clientDbUrl}/financialData`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId: userId, api_key: apiKey }),
-    });
-    if (!response.ok) {
-      throw new Error(
-        `Error fetching user financialData: ${response.statusText}`
-      );
-    }
-    const data = await response.json();
+// export async function FinancialData(userId: string) {
+//   try {
+//     const response = await fetch(`${clientDbUrl}/financialData`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({ userId: userId, api_key: apiKey }),
+//     });
+//     if (!response.ok) {
+//       throw new Error(
+//         `Error fetching user financialData: ${response.statusText}`
+//       );
+//     }
+//     const data = await response.json();
 
-    return data;
-  } catch (error) {
-    console.error("Error fetching user financialData:", error);
-    throw error;
-  }
-}
+//     return data;
+//   } catch (error) {
+//     console.error("Error fetching user financialData:", error);
+//     throw error;
+//   }
+// }
 
 export async function AllTransactions(userId: string) {
   try {
@@ -126,26 +126,26 @@ export async function AllTransactions(userId: string) {
   }
 }
 
-export async function allBills(userId: string) {
-  try {
-    const response = await fetch(`${clientDbUrl}/bills`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId: userId, api_key: apiKey }),
-    });
-    if (!response.ok) {
-      throw new Error(`Error fetching user Bills: ${response.statusText}`);
-    }
-    const data = await response.json();
+// export async function allBills(userId: string) {
+//   try {
+//     const response = await fetch(`${clientDbUrl}/bills`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({ userId: userId, api_key: apiKey }),
+//     });
+//     if (!response.ok) {
+//       throw new Error(`Error fetching user Bills: ${response.statusText}`);
+//     }
+//     const data = await response.json();
 
-    return data;
-  } catch (error) {
-    console.error("Error fetching user Bills:", error);
-    throw error;
-  }
-}
+//     return data;
+//   } catch (error) {
+//     console.error("Error fetching user Bills:", error);
+//     throw error;
+//   }
+// }
 
 export async function PostData(PostData: any, endpoint: string) {
   try {
