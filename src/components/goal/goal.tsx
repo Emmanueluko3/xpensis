@@ -527,7 +527,7 @@ const Goal: React.FC = () => {
       {deleteGoal && (
         <DeleteModal
           onClose={() => setDeleteGoal(null)}
-          onDelete={() => deleteOneGoal(deleteGoal?.billId)}
+          onDelete={() => deleteOneGoal(deleteGoal?.goalId)}
           title="Delete"
           subtitle="Are you sure you want to delete this Goal?"
         />
