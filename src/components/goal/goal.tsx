@@ -150,7 +150,7 @@ const Goal: React.FC = () => {
 
   useEffect(() => {
     const fetchGoals = async () => {
-      const goals = await PostData(goalData, "/goals");
+      const goals = await PostData({}, "/goals");
       setGoalList(goals?.response?.items);
     };
 

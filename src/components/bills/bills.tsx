@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProgressBar from "../atoms/progressbar";
 import Modal from "../molecules/Modals/modal";
 import Switch from "../atoms/switch";
@@ -11,6 +11,7 @@ import SelectGroup from "../molecules/inputGroup/selectGroup";
 import Card from "../molecules/cards/card";
 import { PostData } from "@/lib/outerbase/allCommands";
 import ModalComponent from "../molecules/Modals/modalComponent";
+import { useSession } from "next-auth/react";
 
 const energyIcon = (
   <svg
@@ -155,6 +156,12 @@ const recentTransactions = [
     status: "Pending",
   },
 ];
+
+type SortFunction<T> = (a: T, b: T) => number;
+
+const sortByDate: SortFunction<any> = (a, b) =>
+  new Date(b.date).getTime() - new Date(a.date).getTime();
+
 const currentDate = new Date();
 const months: string[] = [
   "Jan",
@@ -187,16 +194,27 @@ const allBanks = [
   { label: "Zenith Bank", value: "Zenith Bank" },
 ];
 
-interface billProps {
-  userBills: any[];
-}
-const Bill: React.FC<billProps> = ({ userBills }) => {
+const Bill: React.FC = () => {
   const [tab, setTab] = useState(0);
   const [addCategory, setAddCategory] = useState(false);
   const [notifyModal, setNotifyModal] = useState(false);
   const [newBill, setNewBill] = useState(false);
   const [payBill, setPayBill] = useState<any>(null);
   const tabs = ["Recurring Bills", "Non-recurring Bills"];
+
+  // fetchedBill
+  const [userBills, setUserBills] = useState<any[]>([]);
+  useEffect(() => {
+    async function fetchUserBills() {
+      try {
+        const data = await PostData({}, "/bills");
+        setUserBills(data.response.items);
+      } catch (error) {
+        console.error("Error in fetchUserBills:", error);
+      }
+    }
+    fetchUserBills();
+  }, []);
 
   // bill input fields
   const [title, setTitle] = useState("");
@@ -396,6 +414,7 @@ const Bill: React.FC<billProps> = ({ userBills }) => {
     <>
       {userBills
         .filter((item) => item.isRecurring === 1)
+        ?.sort(sortByDate)
         ?.map((item, index) => (
           <div
             key={index}
@@ -441,7 +460,8 @@ const Bill: React.FC<billProps> = ({ userBills }) => {
   const nonRecurringBills = (
     <>
       {userBills
-        .filter((item) => item.isRecurring === 0)
+        ?.filter((item) => item.isRecurring === 0)
+        ?.sort(sortByDate)
         ?.map((item, index) => (
           <div
             onClick={() => setPayBill(item)}
@@ -631,7 +651,12 @@ const Bill: React.FC<billProps> = ({ userBills }) => {
           </>
         )}
         <div className="w-full">
-          <Button onClick={() => createBill()}>Create</Button>
+          <Button
+            disabled={!title || !amount || !categoryTitle ? true : false}
+            onClick={() => createBill()}
+          >
+            Create
+          </Button>
         </div>
       </div>
     </div>

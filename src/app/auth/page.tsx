@@ -11,6 +11,8 @@ import LottieSuccess from "@/../public/assets/lotties/lottieSuccess.json";
 import LottieNotification from "@/../public/assets/lotties/lottieNotification.json";
 import { getCsrfToken, signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Spinner from "@/components/molecules/spinners/spinner";
+import toast from "react-hot-toast";
 
 const visibleIcon = (
   <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 576 512">
@@ -52,6 +54,7 @@ const FormSection: React.FC = () => {
   const [errorConfirmPassword, setErrorConfirmPassword] = useState("");
   const [passwordMismatchError, setPasswordMismatchError] = useState("");
   const [validEmail, setValidEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const registredModal = (
     <div className="p-5 rounded-lg bg-[#fff] lg:w-[40vw] w-[95%] overflow-x-auto no-scrollbar relative flex justify-center items-center flex-col">
@@ -121,8 +124,9 @@ const FormSection: React.FC = () => {
         fullName: fullName,
         password: password,
       };
+      setLoading(true);
 
-      console.log("userData is: " + userData);
+      // console.log("userData is: " + userData);
 
       const registeredUser = await (
         await fetch("api/register", {
@@ -131,7 +135,7 @@ const FormSection: React.FC = () => {
         })
       ).json();
 
-      console.log("registeredUser", registeredUser);
+      // console.log("registeredUser", registeredUser);
 
       const credentials = {
         email,
@@ -141,6 +145,8 @@ const FormSection: React.FC = () => {
       await signIn("credentials", credentials);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -152,6 +158,7 @@ const FormSection: React.FC = () => {
       setErrorPassword("Please enter your password.");
     } else {
       try {
+        setLoading(true);
         const credentials = {
           email,
           password,
@@ -167,6 +174,9 @@ const FormSection: React.FC = () => {
           : localStorage.removeItem("userCredentials");
       } catch (error) {
         console.log(error);
+        toast.error("invalid credentials");
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -187,6 +197,7 @@ const FormSection: React.FC = () => {
 
   return (
     <div className="w-full h-screen">
+      {loading && <Spinner />}
       <div className="flex justify-center items-center flex-row z-50 px-6 py-6 w-full bg-white">
         <div className="h-6">
           <Image

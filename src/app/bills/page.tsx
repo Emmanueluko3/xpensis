@@ -33,7 +33,7 @@ export default function Bills() {
         <div className="bg-[#F9FAFA] h-full p-5 pt-20 pb-24 lg:pb-5 lg:pt-5 w-full lg:pr-9">
           <div className="w-full mb-5 grid grid-flow-row lg:grid-cols-3 gap-3">
             <div className="w-full lg:col-span-2">
-              <Bill userBills={userBills} />
+              <Bill />
             </div>
             <div className="lg:col-span-1">
               <UpcomingPayments />
