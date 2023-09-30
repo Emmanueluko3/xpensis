@@ -280,7 +280,7 @@ const Bill: React.FC = () => {
         : false;
       const cellClass = isDateSelected
         ? "bg-blue-500 text-white cursor-pointer"
-        : "cursor-pointer";
+        : "cursor-pointer lg:hover:bg-blue-500 lg:hover:text-white";
 
       calendarGrid.push(
         <div

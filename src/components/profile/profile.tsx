@@ -9,6 +9,7 @@ import Card from "../molecules/cards/card";
 import Switch from "../atoms/switch";
 import { signOut } from "next-auth/react";
 import { PostData } from "@/lib/outerbase/allCommands";
+import TopupModal from "../molecules/Modals/topupModal";
 
 const plusIcon = (
   <svg
@@ -144,7 +145,7 @@ const ProfileComponent: React.FC = () => {
     const fetchData = async () => {
       try {
         const financialData = await PostData({}, "/financialData");
-        setFinancialData(financialData);
+        setFinancialData(financialData[0]);
       } catch (error) {
         console.error("Error in fetchData:", error);
       }
@@ -174,10 +175,13 @@ const ProfileComponent: React.FC = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [profileTab]);
 
   return (
     <div className="grid grid-flow-row grid-cols-5 gap-3">
+      {/* <TopupModal onClose={() => {}} onTopup={() => {}} title="Iphone 12">
+        ds
+      </TopupModal> */}
       <div
         className={`${
           settingsScreen ? "hidden" : "block"
@@ -209,14 +213,14 @@ const ProfileComponent: React.FC = () => {
             <Card
               title="Balance"
               price={
-                financialData[0]?.balance !== null || undefined
-                  ? financialData[0]?.balance
+                financialData?.balance !== null || undefined
+                  ? financialData?.balance
                   : 0
               }
               duration="Last Month"
               percentage={
-                financialData[0]?.percentage !== null || undefined
-                  ? financialData[0]?.percentage
+                financialData?.percentage !== null || undefined
+                  ? financialData?.percentage
                   : 0
               }
               variant="#0784C7"

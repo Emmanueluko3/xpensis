@@ -4,6 +4,8 @@ import ProgressBar from "../atoms/progressbar";
 import Modal from "../molecules/Modals/modal";
 import Switch from "../atoms/switch";
 import LottieSuccess from "../../../public/assets/lotties/lottieSuccess.json";
+import LottieError from "@/../public/assets/lotties/Error.json";
+
 import Lottie from "../atoms/lottie";
 import Image from "next/image";
 import GoalImg from "@/../public/assets/images/goal.jpg";
@@ -13,6 +15,8 @@ import { PostData } from "@/lib/outerbase/allCommands";
 import ModalComponent from "../molecules/Modals/modalComponent";
 import Button from "../atoms/button";
 import DeleteModal from "../molecules/Modals/deleteModal";
+import TopupModal from "../molecules/Modals/topupModal";
+import Spinner from "../molecules/spinners/spinner";
 
 const arrowIcon = (
   <svg
@@ -160,6 +164,10 @@ const Goal: React.FC = () => {
   const [nextDueDate, setNextDueDate] = useState<Date | null>(null);
   const [notifyModal, setNotifyModal] = useState<any>(null);
   const [deleteGoal, setDeleteGoal] = useState<any>(null);
+  const [topupGoal, setTopupGoal] = useState<any>(null);
+  const [topupAmount, setTopupAmount] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [accountBalance, setAccountBalance] = useState("");
   const goalData = {
     title: title,
     goalAmount: amount,
@@ -171,6 +179,7 @@ const Goal: React.FC = () => {
 
   const createGoal = async () => {
     try {
+      setIsLoading(true);
       const post = await PostData(goalData, "/createGoal");
       if (post) {
         setTitle("");
@@ -189,11 +198,14 @@ const Goal: React.FC = () => {
       }
     } catch (error) {
       console.error("Error creating", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const deleteOneGoal = async (id: any) => {
     try {
+      setIsLoading(true);
       const post = await PostData({ goalId: id }, "/deleteOneGoal");
       if (post) {
         setNotifyModal({
@@ -205,6 +217,47 @@ const Goal: React.FC = () => {
       setDeleteGoal(null);
     } catch (error) {
       console.error("Error deleting", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const topupOneGoal = async (topupData: any, goalAmount: any) => {
+    if (topupData.amount > goalAmount) {
+      setNotifyModal({
+        lottie: LottieError,
+        title: "Error!",
+        subtitle: "Input amount is greater than goal amount",
+      });
+    }
+    if (topupData.amount > accountBalance) {
+      setNotifyModal({
+        lottie: LottieError,
+        title: "Error!",
+        subtitle: "Insufficient Balance! Please recharge your account",
+      });
+    } else {
+      try {
+        setIsLoading(true);
+        const post = await PostData(topupData, "/topupOneGoal");
+        if (post) {
+          setNotifyModal({
+            lottie: LottieSuccess,
+            title: "Successful!",
+            subtitle: "Goal has been Deleted!",
+          });
+        }
+        setTopupGoal(null);
+      } catch (error) {
+        console.error("Error deleting", error);
+        setNotifyModal({
+          lottie: LottieError,
+          title: "Error!",
+          subtitle: "Error Occured!",
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -215,10 +268,18 @@ const Goal: React.FC = () => {
     };
 
     fetchGoals();
-    const fetchDataInterval = setInterval(fetchGoals, 5000);
+    const fetchDataInterval = setInterval(fetchGoals, 7000);
     return () => clearInterval(fetchDataInterval);
   }, []);
-  // console.log("all goals are available", goalList);
+
+  useEffect(() => {
+    const fetchAccountBalance = async () => {
+      const fetchBalance = await PostData({}, "/financialData");
+      setAccountBalance(fetchBalance[0].balance);
+    };
+    fetchAccountBalance();
+  }, [topupGoal]);
+
   const handleMonthChange = (increment: number) => {
     setCurrentMonth((prevMonth) => {
       const newMonth = prevMonth + increment;
@@ -232,22 +293,18 @@ const Goal: React.FC = () => {
       return newMonth;
     });
   };
-
   const renderCalendar = () => {
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // Get the number of days in the selected month
     const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // Get the day of the week (0 - 6) for the 1st day of the month
 
-    // Create an array to hold the grid cells for the calendar
     const calendarGrid: JSX.Element[] = [];
 
-    // Fill in empty grid cells for days before the 1st day of the month
     for (let i = 0; i < firstDayOfMonth; i++) {
       calendarGrid.push(
         <div key={`empty-${i}`} className="text-gray-100 font-semibold"></div>
       );
     }
 
-    // Fill in grid cells for each day of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentYear, currentMonth, day);
 
@@ -257,7 +314,7 @@ const Goal: React.FC = () => {
         : false;
       const cellClass = isDateSelected
         ? "bg-blue-500 text-white cursor-pointer"
-        : "cursor-pointer";
+        : "cursor-pointer lg:hover:bg-blue-500 lg:hover:text-white";
 
       calendarGrid.push(
         <div
@@ -280,7 +337,10 @@ const Goal: React.FC = () => {
           key={index}
           className="flex items-center border-b-[0.1px] border-[#D2D2D2] mb-2"
         >
-          <div className="py-4 border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2">
+          <div
+            onClick={() => setTopupGoal(item)}
+            className="py-4 cursor-pointer border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"
+          >
             <div className="lg:w-[45%] w-[70%] flex justify-center items-center">
               <div
                 className={`flex justify-center text-2xl items-center w-9 h-10 rounded-lg bg-opacity-5 mr-3 bg-customBlue border p-1`}
@@ -338,7 +398,8 @@ const Goal: React.FC = () => {
     if (decimalCount > 1) {
       inputValue = inputValue.slice(0, inputValue.lastIndexOf("."));
     }
-    setAmount(inputValue);
+
+    return inputValue;
   };
 
   const addGoalForm = (
@@ -378,7 +439,7 @@ const Goal: React.FC = () => {
         <div className="w-full mb-3">
           <InputGroup
             value={`₦ ${amount}`}
-            onChange={(e) => handleAmountChange(e)}
+            onChange={(e) => setAmount(handleAmountChange(e))}
             label="Amount"
             placeholder="1,000"
             type="text"
@@ -534,6 +595,65 @@ const Goal: React.FC = () => {
           subtitle="Are you sure you want to delete this Goal?"
         />
       )}
+      {topupGoal && (
+        <TopupModal
+          btnDisable={!topupAmount ? true : false}
+          onClose={() => setTopupGoal(null)}
+          onTopup={() =>
+            topupOneGoal(
+              {
+                title: topupGoal?.title,
+                amount: parseInt(topupAmount),
+                goalId: topupGoal?.goalId,
+              },
+              topupGoal?.goalAmount
+            )
+          }
+          title={topupGoal?.title}
+        >
+          <div className="w-full flex flex-col justify-center items-center">
+            <div className="rounded-lg h-36 w-36 border p-2">
+              <Image
+                src={topupGoal?.imageUrl ? topupGoal.imageUrl : GoalImg}
+                width={500}
+                height={500}
+                className="w-full h-full rounded-lg"
+                alt={topupGoal?.title}
+              />
+            </div>
+            <div className="my-3 w-1/2 flex justify-center items-center flex-col">
+              <p className=" text-customGray1 text-xs font-normal mb-2">
+                {Math.round(
+                  (topupGoal.currentAmount / topupGoal.goalAmount) * 100
+                )}
+                /100%
+              </p>
+              <ProgressBar
+                progress={
+                  (topupGoal.currentAmount / topupGoal.goalAmount) * 100
+                }
+                addClassName="h-[6px]"
+              />
+            </div>
+            <h3 className="text-sm lg:text-base font-semibold">
+              &#8358; {topupGoal?.currentAmount}.00{" "}
+              <span className="font-normal">
+                / &#8358;{topupGoal?.goalAmount}.00
+              </span>
+            </h3>
+            <div className="w-full mb-4">
+              {" "}
+              <InputGroup
+                value={`₦ ${topupAmount}`}
+                onChange={(e) => setTopupAmount(handleAmountChange(e))}
+                label="Amount"
+                placeholder="1,000"
+                type="text"
+              />
+            </div>
+          </div>
+        </TopupModal>
+      )}
       {addGoal ? <Modal onClose={handleCloseModal}>{addGoalForm}</Modal> : ""}
       <button
         onClick={() => setAddGoal(true)}
@@ -541,6 +661,7 @@ const Goal: React.FC = () => {
       >
         New Goal
       </button>
+      {isLoading && <Spinner />}
     </div>
   );
 };
