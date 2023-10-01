@@ -7,14 +7,6 @@
     {
       "path": "/api/cronWeekly",
       "schedule": "0 5 * * 0"
-    },
-    {
-      "path": "/api/cronMonthly",
-      "schedule": "0 6 1 * *"
-    },
-    {
-      "path": "/api/cronYearly",
-      "schedule": "0 7 1 1 *"
     }
   ]
 }
