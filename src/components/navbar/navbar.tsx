@@ -1,13 +1,15 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import ProfilePics from "@/../public/assets/images/ProfilePics.svg";
+import ProfilePics from "@/../public/assets/images/ProfilePics.webp";
+// import ProfilePics from "@/../public/assets/images/ProfilePics.svg";
 import Xpensis from "@/../public/assets/images/Xpensis.svg";
 import LottieNotification from "@/../public/assets/lotties/lottieNotification.json";
 import Lottie from "../atoms/lottie";
 import { useSession } from "next-auth/react";
+import { PostData } from "@/lib/outerbase/allCommands";
 
 const notificationIcon = (
   <svg
@@ -37,6 +39,7 @@ const navLinks = [
 const Navbar: React.FC = () => {
   const pathname = usePathname().split("/")[1];
   const [isNotification, setIsNotification] = useState(false);
+  const [userData, setUserData] = useState<any>([]);
 
   const { data: session }: any = useSession();
   const fullName = session?.user?.items[0]?.fullName;
@@ -47,6 +50,18 @@ const Navbar: React.FC = () => {
     )
     .map((item) => item.label);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const profileData = await PostData({}, "/profile");
+        setUserData(profileData[0]);
+      } catch {}
+    };
+    fetchData();
+    const fetchDataInterval = setInterval(fetchData, 100000);
+
+    return () => clearInterval(fetchDataInterval);
+  }, []);
   return (
     <>
       <div className="justify-between bg-white z-50 p-5 lg:pr-9 w-full hidden lg:flex">
@@ -65,7 +80,13 @@ const Navbar: React.FC = () => {
             <div className="flex items-center">
               <div className="h-8 w-8 mr-2">
                 <Image
-                  src={ProfilePics}
+                  src={
+                    userData?.profilePicture
+                      ? userData?.profilePicture
+                      : ProfilePics
+                  }
+                  width={500}
+                  height={500}
                   className="rounded-full w-full h-full"
                   alt="Profile"
                 />

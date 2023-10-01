@@ -10,6 +10,10 @@ import Switch from "../atoms/switch";
 import { signOut } from "next-auth/react";
 import { PostData } from "@/lib/outerbase/allCommands";
 import TopupModal from "../molecules/Modals/topupModal";
+import ModalComponent from "../molecules/Modals/modalComponent";
+import LottieSuccess from "../../../public/assets/lotties/lottieSuccess.json";
+import LottieError from "@/../public/assets/lotties/Error.json";
+import Spinner from "../molecules/spinners/spinner";
 
 const plusIcon = (
   <svg
@@ -128,6 +132,11 @@ const ProfileComponent: React.FC = () => {
     allNotifications.map(() => false)
   );
 
+  // topup
+  const [notifyModal, setNotifyModal] = useState<any>(null);
+  const [topupAccount, setTopupAccount] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [amount, setAmount] = useState("");
   console.log("notifications are", notificationStates);
 
   const handleSwitchChange = (index: number) => {
@@ -177,11 +186,54 @@ const ProfileComponent: React.FC = () => {
     fetchData();
   }, [profileTab]);
 
+  const handleAmountChange = (e: any) => {
+    let inputValue = e.target.value;
+    inputValue = inputValue.replace(/[^0-9.]/g, "");
+    const decimalCount = (inputValue.match(/\./g) || []).length;
+    if (decimalCount > 1) {
+      inputValue = inputValue.slice(0, inputValue.lastIndexOf("."));
+    }
+
+    return inputValue;
+  };
+
+  const topupBalance = async (topupData: any) => {
+    console.log;
+    try {
+      setIsLoading(true);
+      const post = await PostData(topupData, "/fundAccount");
+      if (post) {
+        setNotifyModal({
+          lottie: LottieSuccess,
+          title: "Successful!",
+          subtitle: "Goal has been Deleted!",
+        });
+      }
+      setAmount("");
+      setTopupAccount(false);
+    } catch (error) {
+      console.error("Error toping up", error);
+      setNotifyModal({
+        lottie: LottieError,
+        title: "Error!",
+        subtitle: "Error Occured!",
+      });
+      setTopupAccount(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="grid grid-flow-row grid-cols-5 gap-3">
-      {/* <TopupModal onClose={() => {}} onTopup={() => {}} title="Iphone 12">
-        ds
-      </TopupModal> */}
+      {notifyModal && (
+        <ModalComponent
+          lottie={notifyModal.lottie}
+          title={notifyModal.title}
+          subtitle={notifyModal.subtitle}
+          onClose={() => setNotifyModal(null)}
+        />
+      )}
       <div
         className={`${
           settingsScreen ? "hidden" : "block"
@@ -226,7 +278,10 @@ const ProfileComponent: React.FC = () => {
               variant="#0784C7"
             />
           </div>
-          <button className="flex items-center justify-center w-full py-3 px-6 mr-5 text-customBlue border border-customBlue rounded-lg hover:bg-customBlue hover:text-white">
+          <button
+            onClick={() => setTopupAccount(true)}
+            className="flex items-center justify-center w-full py-3 px-6 mr-5 text-customBlue border border-customBlue rounded-lg lg:hover:bg-customBlue lg:hover:text-white"
+          >
             <span className="mr-2">{plusIcon}</span>Top Up
           </button>
         </div>
@@ -447,6 +502,51 @@ const ProfileComponent: React.FC = () => {
           </div>
         )}
       </div>
+
+      {topupAccount && (
+        <TopupModal
+          btnDisable={!amount ? true : false}
+          onClose={() => setTopupAccount(false)}
+          onTopup={() =>
+            topupBalance({
+              title: "Wallet Funding",
+              amount: parseInt(amount),
+            })
+          }
+          title="Fund Account"
+        >
+          <div className="w-full flex flex-col justify-center items-center">
+            <div className="mb-3 w-full">
+              <Card
+                title="Balance"
+                price={
+                  financialData?.balance !== null || undefined
+                    ? financialData?.balance
+                    : 0
+                }
+                duration="Last Month"
+                percentage={
+                  financialData?.percentage !== null || undefined
+                    ? financialData?.percentage
+                    : 0
+                }
+                variant="#0784C7"
+              />
+            </div>
+            <div className="w-full mb-4">
+              {" "}
+              <InputGroup
+                value={`₦ ${amount}`}
+                onChange={(e) => setAmount(handleAmountChange(e))}
+                label="Amount"
+                placeholder="1,000"
+                type="text"
+              />
+            </div>
+          </div>
+        </TopupModal>
+      )}
+      {isLoading && <Spinner />}
     </div>
   );
 };

@@ -5,7 +5,6 @@ import Modal from "../molecules/Modals/modal";
 import Switch from "../atoms/switch";
 import LottieSuccess from "../../../public/assets/lotties/lottieSuccess.json";
 import LottieError from "@/../public/assets/lotties/Error.json";
-
 import Lottie from "../atoms/lottie";
 import Image from "next/image";
 import GoalImg from "@/../public/assets/images/goal.jpg";
@@ -214,12 +213,12 @@ const Goal: React.FC = () => {
           setNotifyModal({
             lottie: LottieSuccess,
             title: "Successful!",
-            subtitle: "Goal has been Deleted!",
+            subtitle: "Your Transaction was successful!",
           });
         }
         setTopupGoal(null);
       } catch (error) {
-        console.error("Error deleting", error);
+        console.error("Error topingUp", error);
         setNotifyModal({
           lottie: LottieError,
           title: "Error!",
@@ -436,6 +435,7 @@ const Goal: React.FC = () => {
                 className=" absolute right-0 top-0 font-bold rounded-full"
                 onClick={() => {
                   localStorage.removeItem("imageUrl");
+                  setImageUrl("");
                 }}
               >
                 X
