@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ProgressBar from "../atoms/progressbar";
 import Modal from "../molecules/Modals/modal";
 import Switch from "../atoms/switch";
@@ -17,6 +17,7 @@ import Button from "../atoms/button";
 import DeleteModal from "../molecules/Modals/deleteModal";
 import TopupModal from "../molecules/Modals/topupModal";
 import Spinner from "../molecules/spinners/spinner";
+import { handleImage } from "@/lib/utils/uploadImage";
 
 const arrowIcon = (
   <svg
@@ -90,39 +91,6 @@ const cloudIcon = (
     />
   </svg>
 );
-const goalsList = [
-  {
-    title: "iPhone 12",
-    amount: 120000,
-    date: "15th May, 2023",
-    status: "Paid",
-  },
-  {
-    title: "iPhone 12",
-    amount: 120000,
-    date: "15th May, 2023",
-    status: "Pending",
-  },
-  {
-    title: "iPhone 12",
-    amount: 120000,
-    date: "15th May, 2023",
-    status: "Pending",
-  },
-  {
-    title: "iPhone 12",
-    amount: 120000,
-    date: "15th May, 2023",
-    status: "Pending",
-  },
-
-  {
-    title: "iPhone 12",
-    amount: 120000,
-    date: "15th May, 2023",
-    status: "Pending",
-  },
-];
 const currentDate = new Date();
 const months: string[] = [
   "Jan",
@@ -142,6 +110,7 @@ const months: string[] = [
 const days: string[] = ["Sun", "Mon", "Tue", "Tue", "Thu", "Fri", "Sat"];
 
 const Goal: React.FC = () => {
+  const imageRef = useRef<any>(null);
   const [addGoal, setAddGoal] = useState(false);
   const [goalList, setGoalList] = useState<any>([]);
   const [currentYear, setCurrentYear] = useState<number>(
@@ -184,6 +153,7 @@ const Goal: React.FC = () => {
       if (post) {
         setTitle("");
         setAmount("");
+        setImageUrl("");
 
         setIsRecurring(false);
         setRecurrenceFrequency("");
@@ -273,12 +243,18 @@ const Goal: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const storedImageDetails: any = localStorage.getItem("imageUrl");
+    if (storedImageDetails) {
+      const parsedDetails = JSON.parse(storedImageDetails);
+
+      setImageUrl(parsedDetails?.url);
+    }
     const fetchAccountBalance = async () => {
       const fetchBalance = await PostData({}, "/financialData");
       setAccountBalance(fetchBalance[0].balance);
     };
     fetchAccountBalance();
-  }, [topupGoal]);
+  }, [topupGoal, addGoal]);
 
   const handleMonthChange = (increment: number) => {
     setCurrentMonth((prevMonth) => {
@@ -339,7 +315,7 @@ const Goal: React.FC = () => {
         >
           <div
             onClick={() => setTopupGoal(item)}
-            className="py-4 cursor-pointer border-b-[0.1px] border-[#D2D2D2] w-full flex justify-between mb-2"
+            className="py-4 cursor-pointer w-full flex justify-between mb-2"
           >
             <div className="lg:w-[45%] w-[70%] flex justify-center items-center">
               <div
@@ -402,6 +378,13 @@ const Goal: React.FC = () => {
     return inputValue;
   };
 
+  const onFileChange = async (e: any) => {
+    const imageDetails = await handleImage(e);
+
+    setImageUrl(imageDetails.url);
+    console.log("Uploaded image details:", imageDetails);
+  };
+
   const addGoalForm = (
     <div className="lg:p-5 p-3 rounded-lg bg-[#fff] lg:w-[40vw] overflow-x-auto lg:max-h-[94vh] max-h-[80vh] no-scrollbar">
       <div className="flex justify-between pb-3 mb-5 border-b">
@@ -447,14 +430,47 @@ const Goal: React.FC = () => {
         </div>
 
         <div className="p-4 rounded-lg mb-3 w-full border border-dashed border-[#D2D2D2] flex justify-center items-center flex-col">
-          <p className="mb-[5px] text-customGray">{cloudIcon}</p>
-          <p className="text-customGray text-sm mb-[5px]">
-            Click to upload (Optional)
-          </p>
-          <p className="text-customGray text-xs mb-3">Max. File Size: 10MB</p>
-          <button className="py-2 px-3 w-1/2 border-customBlue rounded-lg border text-customBlue lg:hover:text-white lg:hover:bg-customBlue">
-            Browse File
-          </button>
+          {imageUrl ? (
+            <div className="w-full relative">
+              <button
+                className=" absolute right-0 top-0 font-bold rounded-full"
+                onClick={() => {
+                  localStorage.removeItem("imageUrl");
+                }}
+              >
+                X
+              </button>
+              <Image
+                src={imageUrl}
+                alt=""
+                className=" h-44 w-full object-contain rounded-lg "
+                width={500}
+                height={500}
+              />
+            </div>
+          ) : (
+            <>
+              <p className="mb-[5px] text-customGray">{cloudIcon}</p>
+              <p className="text-customGray text-sm mb-[5px]">
+                Click to upload (Optional)
+              </p>
+              <p className="text-customGray text-xs mb-3">
+                Max. File Size: 10MB
+              </p>
+              <button
+                onClick={() => imageRef.current.click()}
+                className="py-2 px-3 w-1/2 border-customBlue rounded-lg border text-customBlue lg:hover:text-white lg:hover:bg-customBlue"
+              >
+                Browse File
+              </button>
+              <input
+                onChange={onFileChange}
+                type="file"
+                ref={imageRef}
+                className="hidden"
+              />
+            </>
+          )}
         </div>
 
         <div className="rounded-lg p-3 mb-3 flex justify-between items-center">
