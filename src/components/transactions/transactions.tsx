@@ -152,7 +152,7 @@ const Transactions: React.FC = () => {
           </button>
         )}
       </div>
-      <div className="w-full">
+      <div className="w-full overflow-y-auto no-scrollbar max-h-[75vh]">
         {allTransactions?.map((item: any, index) => (
           <div
             key={index}
