@@ -206,7 +206,7 @@ const ProfileComponent: React.FC = () => {
         setNotifyModal({
           lottie: LottieSuccess,
           title: "Successful!",
-          subtitle: "Goal has been Deleted!",
+          subtitle: "Your account has been credited!",
         });
       }
       setAmount("");
